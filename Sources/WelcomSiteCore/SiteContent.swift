@@ -154,8 +154,8 @@ public struct WebsiteViewModel {
             appName: "WelcomTalk",
             badge: "SwiftWasm + Tokamak",
             headline: "One Voice at a Time",
-            tagline: "A Swift-powered web companion that shares portable models with the iOS app while preserving the calm, focused feel of the original site.",
-            architectureLine: "This page is driven by the same Session model and a shared summary view model exposed from the parent WelcomTalk app.",
+            tagline: "A Swift-powered web experience that can now host live browser sessions while still sharing portable models with the iPhone app.",
+            architectureLine: "The browser beta uses the same shared Session model as the parent app, while the iPhone version keeps its local Multipeer experience.",
             features: [
                 FeatureCard(
                     icon: "🎙️",
@@ -165,7 +165,7 @@ public struct WebsiteViewModel {
                 FeatureCard(
                     icon: "📡",
                     title: "Peer-to-Peer",
-                    body: "No internet required. Devices connect directly via Multipeer Connectivity — private by design."
+                    body: "On iPhone, sessions stay device-to-device with Multipeer. On the web beta, a lightweight relay keeps browsers in sync in real time."
                 ),
                 FeatureCard(
                     icon: "⏸️",
@@ -180,18 +180,18 @@ public struct WebsiteViewModel {
                 FeatureCard(
                     icon: "🔒",
                     title: "Private & Offline",
-                    body: "No accounts. No servers. No data ever leaves your devices."
+                    body: "The iPhone app stays local-first. The browser beta is server-assisted today, so sensitive conversations still belong in the native app."
                 ),
                 FeatureCard(
                     icon: "📱",
                     title: "QR Join",
-                    body: "The host creates a session; guests join by scanning a QR code. Simple and instant."
+                    body: "The host creates a session; guests can join from iPhone with QR or from the web with a shareable code and invite link."
                 ),
             ],
             aboutParagraphs: [
-                "WelcomTalk (displayed as Safe Talk on your device) is an iOS app designed to facilitate fair, structured conversations between two people — whether resolving a dispute, having a difficult discussion, or simply ensuring both voices are heard equally.",
-                "Sessions are fully local. Your iPhone communicates directly with the other person's iPhone via Apple's Multipeer Connectivity framework. No data is sent to any server, no account is needed, and nothing is stored beyond your device.",
-                "Built with SwiftUI for iOS 16+ by Wael Wahbeh, and now mirrored on the web with SwiftWasm + Tokamak.",
+                "WelcomTalk (displayed as Safe Talk on your device) began as an iPhone app for fair, structured conversations between two people — whether resolving a dispute, having a difficult discussion, or simply ensuring both voices are heard equally.",
+                "The iPhone experience remains the most private path: devices connect directly with Multipeer Connectivity and no relay is involved. The browser beta adds a smart web flow so one person can start a session, share a link, and let the other person in from another browser.",
+                "Built with SwiftUI for iOS 16+ by Wael Wahbeh, and mirrored on the web with SwiftWasm + Tokamak plus a lightweight real-time relay for browser sessions.",
             ],
             sharedSessionSummary: demoSessionSummary(),
             sharedSessionNote: "The snapshot below comes from a real shared Swift package dependency on the parent app, not a hand-copied web-only model.",
@@ -205,13 +205,14 @@ public struct WebsiteViewModel {
             route: .privacy,
             title: "Privacy Policy",
             effectiveDate: "March 30, 2026",
-            highlight: "WelcomTalk collects no personal data. No information ever leaves your device or is transmitted to any server.",
+            highlight: "The iPhone app remains local and peer-to-peer. The website beta may relay active session state through a lightweight server so two browsers can sync in real time.",
             sections: [
                 LegalSection(
                     number: "1",
                     title: "Overview",
                     paragraphs: [
-                        "WelcomTalk (Safe Talk) is an iOS application developed by Wael Wahbeh. This Privacy Policy describes how the app handles your information. Because the app is designed to operate entirely offline and peer-to-peer, there is nothing to collect, store remotely, or share."
+                        "WelcomTalk (Safe Talk) is an iOS and web experience developed by Wael Wahbeh. This Privacy Policy describes how the iPhone app and the current website beta handle your information.",
+                        "The iPhone app is designed to operate offline and peer-to-peer. The website beta can host and join live browser sessions and may use a lightweight relay to synchronize the active session between browsers."
                     ]
                 ),
                 LegalSection(
@@ -233,7 +234,8 @@ public struct WebsiteViewModel {
                     number: "3",
                     title: "Data Stored Locally on Your Device",
                     paragraphs: [
-                        "The app stores session history and notes using Apple's Core Data framework, which writes exclusively to your device's local storage. This data is:"
+                        "The iPhone app stores session history and notes using Apple's Core Data framework, which writes exclusively to your device's local storage. This data is:",
+                        "The current website beta keeps the active session in browser memory while the page is open and does not require an account."
                     ],
                     bullets: [
                         "Never transmitted to any server",
@@ -258,9 +260,10 @@ public struct WebsiteViewModel {
                 ),
                 LegalSection(
                     number: "6",
-                    title: "Peer-to-Peer Communication (Multipeer Connectivity)",
+                    title: "Real-Time Communication",
                     paragraphs: [
-                        "Session synchronization between devices uses Apple's Multipeer Connectivity framework (Bluetooth and local Wi-Fi). Communication is direct device-to-device — no data passes through any server operated by us or any third party."
+                        "On iPhone, session synchronization between devices uses Apple's Multipeer Connectivity framework (Bluetooth and local Wi-Fi). Communication is direct device-to-device — no data passes through any server operated by us or any third party.",
+                        "On the website beta, active session state may be relayed through a lightweight WebSocket service so two browsers can stay in sync. If your conversation is highly sensitive, use the iPhone app instead of the current browser beta."
                     ]
                 ),
                 LegalSection(
@@ -274,7 +277,7 @@ public struct WebsiteViewModel {
                     number: "8",
                     title: "Third-Party Services",
                     paragraphs: [
-                        "WelcomTalk does not integrate with any third-party analytics, advertising, or data platforms. No third-party SDKs that collect data are included in the app."
+                        "WelcomTalk does not integrate with analytics, advertising, or profiling SDKs. The browser beta may use a lightweight relay host strictly to pass active session state between connected browsers."
                     ]
                 ),
                 LegalSection(
@@ -288,7 +291,7 @@ public struct WebsiteViewModel {
                     number: "10",
                     title: "Changes to This Policy",
                     paragraphs: [
-                        "If this policy changes materially, an updated version will be posted at this URL with a revised effective date."
+                        "If this policy changes materially, an updated version will be posted at this URL with a revised effective date. As the website beta evolves, this policy will be updated to describe the production web experience more precisely."
                     ]
                 ),
                 LegalSection(
@@ -329,7 +332,7 @@ public struct WebsiteViewModel {
                     number: "3",
                     title: "Permitted Use",
                     paragraphs: [
-                        "The App is intended to facilitate voluntary, structured, face-to-face or near-proximity conversations between consenting adults. You agree to use the App only for lawful purposes and in a manner consistent with its intended design."
+                        "The App and website beta are intended to facilitate voluntary, structured, face-to-face or remote conversations between consenting adults. You agree to use them only for lawful purposes and in a manner consistent with their intended design."
                     ]
                 ),
                 LegalSection(
@@ -370,7 +373,7 @@ public struct WebsiteViewModel {
                     number: "8",
                     title: "Third-Party Frameworks",
                     paragraphs: [
-                        "The App uses Apple platform frameworks (Multipeer Connectivity, Speech, EventKit, Core Data). Your use of those frameworks is additionally subject to Apple's terms and policies."
+                        "The iPhone app uses Apple platform frameworks (Multipeer Connectivity, Speech, EventKit, Core Data). The website beta uses standard browser capabilities and may rely on a lightweight real-time relay to synchronize live sessions. Your use of those frameworks and browser services is additionally subject to the relevant platform terms and policies."
                     ]
                 ),
                 LegalSection(

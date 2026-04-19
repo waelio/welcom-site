@@ -49,6 +49,7 @@ struct WebsiteRootView: View {
 
 struct HomePageView: View {
     let viewModel: HomePageViewModel
+    @StateObject private var sessionStore = SmartSessionStore()
 
     private let featureColumns = [
         GridItem(.adaptive(minimum: 220), spacing: 16),
@@ -109,6 +110,12 @@ struct HomePageView: View {
                     .stroke(SitePalette.accent.opacity(0.25), lineWidth: 1)
             )
             .cornerRadius(24)
+
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "Live web session beta")
+
+                SmartSessionWorkbenchView(sessionStore: sessionStore)
+            }
 
             VStack(alignment: .leading, spacing: 16) {
                 SectionHeading(title: "Why it works")
@@ -355,6 +362,359 @@ struct SessionSnapshotCard: View {
                 .stroke(SitePalette.border, lineWidth: 1)
         )
         .cornerRadius(20)
+    }
+}
+
+struct SmartSessionWorkbenchView: View {
+    @ObservedObject var sessionStore: SmartSessionStore
+
+    private let roundOptions = [2, 4, 6]
+    private let durationOptions = [30, 45, 60]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text(sessionStore.betaNotice)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundColor(SitePalette.textSecondary)
+
+            if let error = sessionStore.errorMessage {
+                SessionCalloutBox(
+                    heading: "Connection note",
+                    detail: error,
+                    accentColor: Color(red: 228 / 255, green: 107 / 255, blue: 99 / 255)
+                )
+            }
+
+            if sessionStore.session == nil {
+                VStack(alignment: .leading, spacing: 16) {
+                    SmartCardShell(title: "Host a live session", subtitle: "Start on one browser, then share the invite link or the six-character code.") {
+                        VStack(alignment: .leading, spacing: 12) {
+                            StyledTextInput(title: "Conversation topic", text: $sessionStore.hostTopic)
+                            StyledTextInput(title: "Your name", text: $sessionStore.hostName)
+
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Rounds per person")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(SitePalette.accentMuted)
+
+                                HStack(spacing: 10) {
+                                    ForEach(roundOptions, id: \.self) { rounds in
+                                        SelectionChip(
+                                            title: "\(rounds)",
+                                            isSelected: sessionStore.selectedRounds == rounds
+                                        ) {
+                                            sessionStore.selectedRounds = rounds
+                                        }
+                                    }
+                                }
+                            }
+
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Seconds per turn")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(SitePalette.accentMuted)
+
+                                HStack(spacing: 10) {
+                                    ForEach(durationOptions, id: \.self) { seconds in
+                                        SelectionChip(
+                                            title: "\(seconds)s",
+                                            isSelected: sessionStore.selectedTurnDuration == seconds
+                                        ) {
+                                            sessionStore.selectedTurnDuration = seconds
+                                        }
+                                    }
+                                }
+                            }
+
+                            WideActionButton(
+                                title: "Start live session",
+                                style: .filled,
+                                isDisabled: !sessionStore.canCreateSession,
+                                action: sessionStore.createSession
+                            )
+                        }
+                    }
+
+                    SmartCardShell(title: "Join from another browser", subtitle: "Open the invite link or paste the code from the host.") {
+                        VStack(alignment: .leading, spacing: 12) {
+                            StyledTextInput(title: "Your name", text: $sessionStore.guestName)
+                            StyledTextInput(title: "Session code", text: $sessionStore.joinCode)
+
+                            WideActionButton(
+                                title: "Join session",
+                                style: .outline,
+                                isDisabled: !sessionStore.canJoinSession,
+                                action: sessionStore.joinSession
+                            )
+                        }
+                    }
+                }
+            } else {
+                SmartCardShell(
+                    title: sessionStore.sessionSummary?.title ?? "Live session",
+                    subtitle: sessionStore.roleLabel.map { "\($0) view" } ?? "Session preview"
+                ) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack(spacing: 10) {
+                            StatusPill(title: sessionStore.connectionStatus, isAccent: true)
+
+                            if let roleLabel = sessionStore.roleLabel {
+                                StatusPill(title: roleLabel, isAccent: false)
+                            }
+
+                            if sessionStore.didCopyInvite {
+                                StatusPill(title: "Invite copied", isAccent: false)
+                            }
+                        }
+
+                        Text(sessionStore.countdownText)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(SitePalette.textSecondary)
+
+                        if let summary = sessionStore.sessionSummary {
+                            VStack(alignment: .leading, spacing: 12) {
+                                SnapshotMetricRow(label: "Status", value: summary.statusText)
+                                SnapshotMetricRow(label: "Current speaker", value: "\(summary.currentSpeakerName) (\(summary.currentSpeakerRole))")
+                                SnapshotMetricRow(label: "Turn progress", value: summary.turnProgressText)
+                                SnapshotMetricRow(label: "Time remaining", value: sessionStore.countdownText)
+                                SnapshotMetricRow(label: "Participants", value: summary.participantsLine)
+                                SnapshotMetricRow(label: "Session code", value: summary.sessionCode)
+                            }
+                        }
+
+                        if let shareURL = sessionStore.shareURL {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Invite link")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(SitePalette.accentMuted)
+
+                                Text(shareURL)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.white)
+                                    .padding(14)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Color.white.opacity(0.03))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .stroke(SitePalette.border.opacity(0.7), lineWidth: 1)
+                                    )
+                                    .cornerRadius(14)
+                            }
+                        }
+
+                        if let pendingName = sessionStore.pendingParticipantName,
+                           sessionStore.hasPendingParticipant {
+                            SessionCalloutBox(
+                                heading: "Guest waiting",
+                                detail: "\(pendingName) wants to join this session. Tap below when you're ready to start.",
+                                accentColor: SitePalette.accent
+                            )
+
+                            WideActionButton(
+                                title: "Let \(pendingName) in",
+                                style: .filled,
+                                isDisabled: false,
+                                action: sessionStore.approvePendingParticipant
+                            )
+                        }
+
+                        HStack(spacing: 12) {
+                            if sessionStore.shareURL != nil {
+                                WideActionButton(
+                                    title: "Copy invite link",
+                                    style: .outline,
+                                    isDisabled: false,
+                                    action: sessionStore.copyInviteLink
+                                )
+                            }
+
+                            WideActionButton(
+                                title: "Reset",
+                                style: .outline,
+                                isDisabled: false,
+                                action: sessionStore.reset
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SitePalette.cardStrong)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(SitePalette.border, lineWidth: 1)
+        )
+        .cornerRadius(20)
+    }
+}
+
+struct SmartCardShell<Content: View>: View {
+    let title: String
+    let subtitle: String
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(title)
+                .font(.system(size: 22, weight: .bold))
+                .foregroundColor(.white)
+
+            Text(subtitle)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundColor(SitePalette.textSecondary)
+
+            content
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.03))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(SitePalette.border.opacity(0.8), lineWidth: 1)
+        )
+        .cornerRadius(18)
+    }
+}
+
+struct StyledTextInput: View {
+    let title: String
+    @Binding var text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(SitePalette.accentMuted)
+
+            TextField(title, text: $text)
+                .foregroundColor(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .background(Color.white.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(SitePalette.border, lineWidth: 1)
+                )
+                .cornerRadius(14)
+        }
+    }
+}
+
+struct SelectionChip: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(isSelected ? SitePalette.heroStart : .white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(isSelected ? SitePalette.accent : Color.white.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(isSelected ? SitePalette.accent : SitePalette.border, lineWidth: 1)
+                )
+                .cornerRadius(12)
+        }
+    }
+}
+
+struct SessionCalloutBox: View {
+    let heading: String
+    let detail: String
+    let accentColor: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(heading.uppercased())
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(accentColor)
+
+            Text(detail)
+                .font(.system(size: 14, weight: .regular))
+                .foregroundColor(SitePalette.textSecondary)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(accentColor.opacity(0.10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(accentColor.opacity(0.35), lineWidth: 1)
+        )
+        .cornerRadius(14)
+    }
+}
+
+struct StatusPill: View {
+    let title: String
+    let isAccent: Bool
+
+    var body: some View {
+        Text(title)
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundColor(isAccent ? SitePalette.heroStart : .white)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(isAccent ? SitePalette.accent : Color.white.opacity(0.05))
+            .overlay(
+                RoundedRectangle(cornerRadius: 999)
+                    .stroke(isAccent ? SitePalette.accent : SitePalette.border, lineWidth: 1)
+            )
+            .cornerRadius(999)
+    }
+}
+
+struct WideActionButton: View {
+    enum Style {
+        case filled
+        case outline
+    }
+
+    let title: String
+    let style: Style
+    let isDisabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(style == .filled ? SitePalette.heroStart : .white)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(backgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(borderColor, lineWidth: 1)
+                )
+                .cornerRadius(14)
+                .opacity(isDisabled ? 0.45 : 1)
+        }
+        .disabled(isDisabled)
+    }
+
+    private var backgroundColor: Color {
+        switch style {
+        case .filled:
+            return SitePalette.accent
+        case .outline:
+            return Color.white.opacity(0.05)
+        }
+    }
+
+    private var borderColor: Color {
+        switch style {
+        case .filled:
+            return SitePalette.accent
+        case .outline:
+            return SitePalette.border
+        }
     }
 }
 
