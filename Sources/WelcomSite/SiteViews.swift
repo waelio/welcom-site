@@ -1,0 +1,450 @@
+import TokamakShim
+import WelcomShared
+import WelcomSiteCore
+
+private enum SitePalette {
+    static let background = Color(red: 10 / 255, green: 22 / 255, blue: 40 / 255)
+    static let heroStart = Color(red: 13 / 255, green: 31 / 255, blue: 60 / 255)
+    static let heroEnd = Color(red: 26 / 255, green: 53 / 255, blue: 96 / 255)
+    static let card = Color.white.opacity(0.05)
+    static let cardStrong = Color.white.opacity(0.07)
+    static let border = Color.white.opacity(0.10)
+    static let textPrimary = Color.white
+    static let textSecondary = Color(red: 168 / 255, green: 184 / 255, blue: 216 / 255)
+    static let accent = Color(red: 201 / 255, green: 168 / 255, blue: 76 / 255)
+    static let accentMuted = Color(red: 216 / 255, green: 200 / 255, blue: 144 / 255)
+}
+
+struct WebsiteRootView: View {
+    let viewModel: WebsiteViewModel
+
+    var body: some View {
+        ZStack {
+            SitePalette.background
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 28) {
+                    switch viewModel.route {
+                    case .home:
+                        HomePageView(viewModel: viewModel.homePage)
+                    case .privacy, .terms:
+                        if let page = viewModel.legalPage {
+                            LegalPageView(viewModel: page)
+                        }
+                    }
+
+                    FooterView(activeRoute: viewModel.route)
+                }
+                .frame(maxWidth: 960, alignment: .leading)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 32)
+            }
+        }
+        .foregroundColor(SitePalette.textPrimary)
+        .onAppear {
+            BrowserSupport.markAppReady()
+        }
+    }
+}
+
+struct HomePageView: View {
+    let viewModel: HomePageViewModel
+
+    private let featureColumns = [
+        GridItem(.adaptive(minimum: 220), spacing: 16),
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 18) {
+                Text(viewModel.badge)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(SitePalette.heroStart)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(SitePalette.accent)
+                    .cornerRadius(999)
+
+                Text(viewModel.appName)
+                    .font(.system(size: 42, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text(viewModel.headline)
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundColor(SitePalette.accent)
+
+                Text(viewModel.tagline)
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(SitePalette.textSecondary)
+
+                Text(viewModel.architectureLine)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(SitePalette.accentMuted)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    FilledActionButton(title: "Privacy Policy") {
+                        BrowserSupport.navigate(to: .privacy)
+                    }
+
+                    OutlineActionButton(title: "Terms of Use") {
+                        BrowserSupport.navigate(to: .terms)
+                    }
+
+                    OutlineActionButton(title: "View Parent App") {
+                        BrowserSupport.open(viewModel.parentRepositoryURL)
+                    }
+                }
+            }
+            .padding(28)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(
+                    colors: [SitePalette.heroStart, SitePalette.heroEnd],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(SitePalette.accent.opacity(0.25), lineWidth: 1)
+            )
+            .cornerRadius(24)
+
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "Why it works")
+
+                LazyVGrid(columns: featureColumns, spacing: 16) {
+                    ForEach(viewModel.features) { feature in
+                        FeatureCardView(feature: feature)
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "Shared session snapshot")
+
+                SessionSnapshotCard(
+                    summary: viewModel.sharedSessionSummary,
+                    note: viewModel.sharedSessionNote,
+                    repositoryName: viewModel.parentRepositoryName,
+                    repositoryURL: viewModel.parentRepositoryURL
+                )
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "About")
+
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(viewModel.aboutParagraphs, id: \.self) { paragraph in
+                        Text(paragraph)
+                            .font(.system(size: 16, weight: .regular))
+                            .foregroundColor(SitePalette.textSecondary)
+                    }
+                }
+                .padding(24)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(SitePalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(SitePalette.border, lineWidth: 1)
+                )
+                .cornerRadius(20)
+            }
+        }
+    }
+}
+
+struct LegalPageView: View {
+    let viewModel: LegalPageViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            OutlineActionButton(title: "← Back to WelcomTalk") {
+                BrowserSupport.navigate(to: .home)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(viewModel.title)
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("Effective: \(viewModel.effectiveDate)")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(SitePalette.textSecondary)
+            }
+
+            if let highlight = viewModel.highlight {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(highlight)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(SitePalette.accentMuted)
+                }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(SitePalette.accent.opacity(0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(SitePalette.accent.opacity(0.35), lineWidth: 1)
+                )
+                .cornerRadius(18)
+            }
+
+            ForEach(viewModel.sections) { section in
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("\(section.number). \(section.title)")
+                        .font(.system(size: 21, weight: .semibold))
+                        .foregroundColor(SitePalette.accent)
+
+                    ForEach(section.paragraphs, id: \.self) { paragraph in
+                        Text(paragraph)
+                            .font(.system(size: 16, weight: .regular))
+                            .foregroundColor(SitePalette.textSecondary)
+                    }
+
+                    if !section.bullets.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(section.bullets, id: \.self) { bullet in
+                                HStack(alignment: .top, spacing: 10) {
+                                    Text("•")
+                                        .foregroundColor(SitePalette.accent)
+                                    Text(bullet)
+                                        .font(.system(size: 16, weight: .regular))
+                                        .foregroundColor(SitePalette.textSecondary)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(24)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(SitePalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(SitePalette.border, lineWidth: 1)
+                )
+                .cornerRadius(20)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Contact")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+                Text(viewModel.contactName)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundColor(SitePalette.textSecondary)
+                Text(viewModel.contactEmail)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundColor(SitePalette.accent)
+            }
+            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(SitePalette.cardStrong)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(SitePalette.border, lineWidth: 1)
+            )
+            .cornerRadius(20)
+        }
+    }
+}
+
+struct FooterView: View {
+    let activeRoute: SiteRoute
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Divider()
+                .overlay(SitePalette.border)
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text("© 2026 Wael Wahbeh. Shared web experience powered by SwiftWasm + Tokamak.")
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(SitePalette.textSecondary)
+
+                HStack(spacing: 10) {
+                    FooterLinkButton(title: "Home", isActive: activeRoute == .home) {
+                        BrowserSupport.navigate(to: .home)
+                    }
+                    FooterLinkButton(title: "Privacy Policy", isActive: activeRoute == .privacy) {
+                        BrowserSupport.navigate(to: .privacy)
+                    }
+                    FooterLinkButton(title: "Terms of Use", isActive: activeRoute == .terms) {
+                        BrowserSupport.navigate(to: .terms)
+                    }
+                    FooterLinkButton(title: "GitHub") {
+                        BrowserSupport.open("https://github.com/waelio/WelcomTalk")
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct SectionHeading: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.system(size: 24, weight: .semibold))
+            .foregroundColor(SitePalette.accent)
+    }
+}
+
+struct FeatureCardView: View {
+    let feature: FeatureCard
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(feature.icon)
+                .font(.system(size: 30))
+
+            Text(feature.title)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(.white)
+
+            Text(feature.body)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundColor(SitePalette.textSecondary)
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SitePalette.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(SitePalette.border, lineWidth: 1)
+        )
+        .cornerRadius(18)
+    }
+}
+
+struct SessionSnapshotCard: View {
+    let summary: SessionSummaryViewModel
+    let note: String
+    let repositoryName: String
+    let repositoryURL: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text(summary.title)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.white)
+
+            Text(note)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundColor(SitePalette.textSecondary)
+
+            VStack(alignment: .leading, spacing: 12) {
+                SnapshotMetricRow(label: "Status", value: summary.statusText)
+                SnapshotMetricRow(label: "Current speaker", value: "\(summary.currentSpeakerName) (\(summary.currentSpeakerRole))")
+                SnapshotMetricRow(label: "Turn progress", value: summary.turnProgressText)
+                SnapshotMetricRow(label: "Turn duration", value: summary.turnDurationText)
+                SnapshotMetricRow(label: "Participants", value: summary.participantsLine)
+                SnapshotMetricRow(label: "Session code", value: summary.sessionCode)
+                SnapshotMetricRow(label: "Rounds", value: summary.totalRoundsText)
+            }
+
+            OutlineActionButton(title: "Open \(repositoryName)") {
+                BrowserSupport.open(repositoryURL)
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SitePalette.cardStrong)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(SitePalette.border, lineWidth: 1)
+        )
+        .cornerRadius(20)
+    }
+}
+
+struct SnapshotMetricRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label.uppercased())
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(SitePalette.accentMuted)
+
+            Text(value)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(.white)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color.white.opacity(0.03))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(SitePalette.border.opacity(0.7), lineWidth: 1)
+        )
+        .cornerRadius(14)
+    }
+}
+
+struct FilledActionButton: View {
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(SitePalette.heroStart)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(SitePalette.accent)
+                .cornerRadius(14)
+        }
+    }
+}
+
+struct OutlineActionButton: View {
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(Color.white.opacity(0.06))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(SitePalette.border, lineWidth: 1)
+                )
+                .cornerRadius(14)
+        }
+    }
+}
+
+struct FooterLinkButton: View {
+    let title: String
+    let isActive: Bool
+    let action: () -> Void
+
+    init(title: String, isActive: Bool = false, action: @escaping () -> Void) {
+        self.title = title
+        self.isActive = isActive
+        self.action = action
+    }
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(isActive ? SitePalette.heroStart : .white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 9)
+                .background(isActive ? SitePalette.accent : Color.white.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(isActive ? SitePalette.accent : SitePalette.border, lineWidth: 1)
+                )
+                .cornerRadius(12)
+        }
+    }
+}
