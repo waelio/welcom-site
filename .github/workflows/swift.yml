@@ -1,22 +1,44 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
-
 name: Swift
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - name: Checkout welcom-site
+        uses: actions/checkout@v4
+        with:
+          path: welcom-site
+
+      - name: Checkout WelcomTalk
+        uses: actions/checkout@v4
+        with:
+          repository: waelio/WelcomTalk
+          ref: first
+          path: WelcomTalk
+
+      - name: Verify shared package is available
+        working-directory: welcom-site
+        run: |
+          if [[ ! -f ../WelcomTalk/Package.swift ]]; then
+            echo "::error::Missing ../WelcomTalk/Package.swift in CI. Push the WelcomTalk shared-package changes to the 'first' branch before running this workflow."
+            exit 1
+          fi
+
+      - name: Show Swift version
+        working-directory: welcom-site
+        run: swift --version
+
+      - name: Resolve dependencies
+        working-directory: welcom-site
+        run: swift package resolve
+
+      - name: Run tests
+        working-directory: welcom-site
+        run: swift test -v
