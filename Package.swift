@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 5.9
 
 import PackageDescription
 
@@ -15,6 +15,7 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
         .package(path: "../WelcomTalk"),
         .package(path: "Vendor/Tokamak"),
         .package(url: "https://github.com/swiftwasm/JavaScriptKit.git", exact: "0.15.0"),

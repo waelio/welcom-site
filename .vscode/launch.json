@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:welcom-site}",
+      "name": "Debug WelcomSite",
+      "target": "WelcomSite",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug WelcomSite"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:welcom-site}",
+      "name": "Release WelcomSite",
+      "target": "WelcomSite",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release WelcomSite"
+    }
+  ]
+}
