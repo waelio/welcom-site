@@ -21,12 +21,16 @@ A SwiftWasm + Tokamak site for WelcomTalk, now with a live browser-session beta 
 
 ## Development
 
-Install `carton` locally, then run the Tokamak dev server for the home page experience:
+For the fastest local start, use `pnpm` to run the static/dev shell:
 
 ```bash
-brew install swiftwasm/tap/carton
-carton dev --product WelcomSite
+pnpm install
+pnpm dev
 ```
+
+That launches a local Vite server on `http://127.0.0.1:4173/index.html` and opens the site automatically.
+
+If you want to experiment with the SwiftWasm/Tokamak path directly, the older `carton` flow is still in the repo, but it is currently less reliable than `pnpm dev` on this machine.
 
 The browser beta currently talks to `wss://waelio-messaging.onrender.com` by default. You can override that in the page shell by setting `window.__WELCOM_WS_URL__` before `app.js` loads.
 

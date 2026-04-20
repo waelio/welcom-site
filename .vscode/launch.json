@@ -1,6 +1,13 @@
 {
   "configurations": [
     {
+      "type": "node-terminal",
+      "request": "launch",
+      "name": "Start WelcomSite (pnpm dev)",
+      "command": "pnpm dev",
+      "cwd": "${workspaceFolder:welcom-site}"
+    },
+    {
       "type": "swift",
       "request": "launch",
       "args": [],

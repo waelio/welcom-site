@@ -2,3 +2,4 @@
 .build/
 .swiftpm/
 Bundle/
+node_modules/
