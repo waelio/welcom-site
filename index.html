@@ -334,6 +334,46 @@
           "Liberation Mono", "Courier New", monospace;
         white-space: pre-wrap;
       }
+      .barcode-card {
+        margin-top: 20px;
+        padding: 22px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .barcode-card[hidden] {
+        display: none;
+      }
+      .barcode-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+      }
+      .barcode-helper {
+        margin-top: 8px;
+        color: #8fa0c0;
+        line-height: 1.7;
+      }
+      .barcode-frame {
+        display: flex;
+        justify-content: center;
+        margin-top: 18px;
+      }
+      .barcode-frame svg {
+        width: min(280px, 100%);
+        height: auto;
+        background: #fff;
+        padding: 14px;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+      }
+      .barcode-caption {
+        margin-top: 14px;
+        text-align: center;
+        color: #d8c890;
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
       .contact-card {
         background: rgba(255, 255, 255, 0.04);
         border-radius: 16px;
@@ -551,6 +591,13 @@
             >
               Download JSON
             </button>
+            <button
+              class="action-button secondary"
+              id="authenticate-jason"
+              type="button"
+            >
+              Verifyveriftherethey Jason
+            </button>
           </div>
 
           <p class="status-line" id="request-json-status">
@@ -560,6 +607,17 @@
           <pre class="json-output" id="request-json-output">
 JSON preview appears here after generation.</pre
           >
+
+          <div class="barcode-card" id="portal-start-card" hidden>
+            <div class="barcode-title">Scan on your iPhone</div>
+            <p class="barcode-helper">
+              Open WelcomTalk on your iPhone, tap
+              <strong>Scan Portal Barcode</strong>, and scan this code to start
+              the session.
+            </p>
+            <div class="barcode-frame" id="portal-start-barcode"></div>
+            <p class="barcode-caption" id="portal-start-caption"></p>
+          </div>
         </div>
 
         <div class="about section-block">
