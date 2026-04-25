@@ -72,6 +72,10 @@ struct HomePageView: View {
                     .font(.system(size: 42, weight: .bold))
                     .foregroundColor(.white)
 
+                Text(viewModel.appCaption.uppercased())
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(SitePalette.accentMuted)
+
                 Text(viewModel.headline)
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundColor(SitePalette.accent)
@@ -85,6 +89,10 @@ struct HomePageView: View {
                     .foregroundColor(SitePalette.accentMuted)
 
                 VStack(alignment: .leading, spacing: 12) {
+                    FilledActionButton(title: "Contact") {
+                        BrowserSupport.open("mailto:\(viewModel.contactEmail)")
+                    }
+
                     FilledActionButton(title: "Privacy Policy") {
                         BrowserSupport.navigate(to: .privacy)
                     }
@@ -114,6 +122,36 @@ struct HomePageView: View {
             .cornerRadius(24)
 
             VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "Introducing the concept")
+
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(viewModel.marketParagraphs, id: \.self) { paragraph in
+                        Text(paragraph)
+                            .font(.system(size: 16, weight: .regular))
+                            .foregroundColor(SitePalette.textSecondary)
+                    }
+                }
+                .padding(24)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(SitePalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(SitePalette.border, lineWidth: 1)
+                )
+                .cornerRadius(20)
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "How it works")
+
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(viewModel.processSteps) { step in
+                        ProcessStepCardView(step: step)
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
                 SectionHeading(title: "Create request JSON")
 
                 RequestJSONBuilderView(requestStore: requestStore)
@@ -121,7 +159,7 @@ struct HomePageView: View {
 
             SessionCalloutBox(
                 heading: "Fair by design",
-                detail: "The Portal starts with a structured request, then stays neutral in live sessions: one person speaks at a time, everyone gets equal timed turns by default, and every participant has space to present their side.",
+                detail: "WelcomTalk Portal starts with a structured request, then stays neutral in live sessions: one person speaks at a time, everyone gets equal timed turns by default, and every participant has space to present their side.",
                 accentColor: SitePalette.accent
             )
 
@@ -129,6 +167,16 @@ struct HomePageView: View {
                 SectionHeading(title: "Live portal session beta")
 
                 SmartSessionWorkbenchView(sessionStore: sessionStore)
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "Who it's for")
+
+                LazyVGrid(columns: featureColumns, spacing: 16) {
+                    ForEach(viewModel.audienceCards) { audience in
+                        FeatureCardView(feature: audience)
+                    }
+                }
             }
 
             VStack(alignment: .leading, spacing: 16) {
@@ -153,7 +201,7 @@ struct HomePageView: View {
             }
 
             VStack(alignment: .leading, spacing: 16) {
-                SectionHeading(title: "About")
+                SectionHeading(title: "About Us")
 
                 VStack(alignment: .leading, spacing: 14) {
                     ForEach(viewModel.aboutParagraphs, id: \.self) { paragraph in
@@ -171,6 +219,15 @@ struct HomePageView: View {
                 )
                 .cornerRadius(20)
             }
+
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "Contact")
+
+                ContactCardView(
+                    paragraphs: viewModel.contactParagraphs,
+                    email: viewModel.contactEmail
+                )
+            }
         }
     }
 }
@@ -181,7 +238,7 @@ struct RequestJSONBuilderView: View {
     var body: some View {
         SmartCardShell(
             title: "Portal request form",
-            subtitle: "This is the portal flow where a user fills in the request and creates the JSON case record."
+            subtitle: "This is the Portal flow inside WelcomTalk where a user fills in the request and creates the JSON case record."
         ) {
             VStack(alignment: .leading, spacing: 14) {
                 StyledTextInput(title: "Full name", text: $requestStore.fullName)
@@ -194,7 +251,7 @@ struct RequestJSONBuilderView: View {
 
                 SessionCalloutBox(
                     heading: "Form note",
-                    detail: "The portal preview currently lists supporting documents by name inside the generated JSON. Real upload and storage wiring can be connected later without changing the request structure.",
+                    detail: "The Portal preview currently lists supporting documents by name inside the generated JSON. Real upload and storage wiring can be connected later without changing the request structure.",
                     accentColor: SitePalette.accentMuted
                 )
 
@@ -256,7 +313,7 @@ struct LegalPageView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            OutlineActionButton(title: "← Back to Portal") {
+            OutlineActionButton(title: "← Back to WelcomTalk") {
                 BrowserSupport.navigate(to: .home)
             }
 
@@ -354,7 +411,7 @@ struct FooterView: View {
                 .overlay(SitePalette.border)
 
             VStack(alignment: .leading, spacing: 12) {
-                Text("© 2026 Wael Wahbeh. Shared portal experience powered by SwiftWasm + Tokamak.")
+                Text("© 2026 Wael Wahbeh. WelcomTalk Portal experience powered by SwiftWasm + Tokamak.")
                     .font(.system(size: 14, weight: .regular))
                     .foregroundColor(SitePalette.textSecondary)
 
@@ -414,6 +471,61 @@ struct FeatureCardView: View {
     }
 }
 
+struct ProcessStepCardView: View {
+    let step: ProcessStep
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(step.stepLabel.uppercased())
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(SitePalette.accentMuted)
+
+            Text(step.title)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundColor(.white)
+
+            Text(step.body)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundColor(SitePalette.textSecondary)
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SitePalette.cardStrong)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(SitePalette.border, lineWidth: 1)
+        )
+        .cornerRadius(18)
+    }
+}
+
+struct ContactCardView: View {
+    let paragraphs: [String]
+    let email: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            ForEach(paragraphs, id: \.self) { paragraph in
+                Text(paragraph)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundColor(SitePalette.textSecondary)
+            }
+
+            OutlineActionButton(title: email) {
+                BrowserSupport.open("mailto:\(email)")
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SitePalette.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(SitePalette.border, lineWidth: 1)
+        )
+        .cornerRadius(20)
+    }
+}
+
 struct SessionSnapshotCard: View {
     let summary: SessionSummaryViewModel
     let note: String
@@ -470,7 +582,7 @@ struct SmartSessionWorkbenchView: View {
 
             SessionCalloutBox(
                 heading: "Current portal scope",
-                detail: "Today's live portal beta supports one host and one guest with equal timed turns. The wider product idea stays flexible so the format can grow over time.",
+                detail: "Today's WelcomTalk Portal beta supports one host and one guest with equal timed turns. The wider product idea stays flexible so the format can grow over time.",
                 accentColor: SitePalette.accentMuted
             )
 
@@ -712,7 +824,7 @@ struct RequestConsentRow: View {
                     .foregroundColor(isSelected ? SitePalette.accent : SitePalette.textSecondary)
                     .font(.system(size: 18, weight: .semibold))
 
-                Text("I agree to submit this information for review and generate the JSON record in the portal.")
+                Text("I agree to submit this information for review and generate the JSON record in WelcomTalk Portal.")
                     .font(.system(size: 14, weight: .regular))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -944,7 +1056,7 @@ final class RequestJSONStore: ObservableObject {
     @Published var additionalNotes: String = ""
     @Published var hasConsent: Bool = false
     @Published private(set) var generatedJSON: String = ""
-    @Published private(set) var statusMessage: String? = "Fill in the request details and consent to generate the JSON record in the portal."
+    @Published private(set) var statusMessage: String? = "Fill in the request details and consent to generate the JSON record in WelcomTalk Portal."
     @Published private(set) var didCopyJSON = false
 
     var canGenerate: Bool {
@@ -979,7 +1091,7 @@ final class RequestJSONStore: ObservableObject {
         }
 
         generatedJSON = json
-        statusMessage = "JSON generated locally in the portal."
+        statusMessage = "JSON generated locally in WelcomTalk Portal."
         didCopyJSON = false
     }
 

@@ -9,11 +9,11 @@ public enum SiteRoute: String, CaseIterable {
     public var title: String {
         switch self {
         case .home:
-            return "Portal – Request JSON Builder"
+            return "WelcomTalk Portal – Request JSON Builder"
         case .privacy:
-            return "Privacy Policy – Portal"
+            return "Privacy Policy – WelcomTalk Portal"
         case .terms:
-            return "Terms of Use – Portal"
+            return "Terms of Use – WelcomTalk Portal"
         }
     }
 
@@ -43,6 +43,20 @@ public struct FeatureCard: Identifiable, Hashable {
     }
 }
 
+public struct ProcessStep: Identifiable, Hashable {
+    public let id: String
+    public let stepLabel: String
+    public let title: String
+    public let body: String
+
+    public init(stepLabel: String, title: String, body: String) {
+        self.id = "\(stepLabel)-\(title)"
+        self.stepLabel = stepLabel
+        self.title = title
+        self.body = body
+    }
+}
+
 public struct LegalSection: Identifiable, Hashable {
     public let id: String
     public let number: String
@@ -61,12 +75,18 @@ public struct LegalSection: Identifiable, Hashable {
 
 public struct HomePageViewModel {
     public let appName: String
+    public let appCaption: String
     public let badge: String
     public let headline: String
     public let tagline: String
     public let architectureLine: String
+    public let marketParagraphs: [String]
+    public let processSteps: [ProcessStep]
+    public let audienceCards: [FeatureCard]
     public let features: [FeatureCard]
     public let aboutParagraphs: [String]
+    public let contactParagraphs: [String]
+    public let contactEmail: String
     public let sharedSessionSummary: SessionSummaryViewModel
     public let sharedSessionNote: String
     public let parentRepositoryURL: String
@@ -74,24 +94,36 @@ public struct HomePageViewModel {
 
     public init(
         appName: String,
+        appCaption: String,
         badge: String,
         headline: String,
         tagline: String,
         architectureLine: String,
+        marketParagraphs: [String],
+        processSteps: [ProcessStep],
+        audienceCards: [FeatureCard],
         features: [FeatureCard],
         aboutParagraphs: [String],
+        contactParagraphs: [String],
+        contactEmail: String,
         sharedSessionSummary: SessionSummaryViewModel,
         sharedSessionNote: String,
         parentRepositoryURL: String,
         parentRepositoryName: String
     ) {
         self.appName = appName
+        self.appCaption = appCaption
         self.badge = badge
         self.headline = headline
         self.tagline = tagline
         self.architectureLine = architectureLine
+        self.marketParagraphs = marketParagraphs
+        self.processSteps = processSteps
+        self.audienceCards = audienceCards
         self.features = features
         self.aboutParagraphs = aboutParagraphs
+        self.contactParagraphs = contactParagraphs
+        self.contactEmail = contactEmail
         self.sharedSessionSummary = sharedSessionSummary
         self.sharedSessionNote = sharedSessionNote
         self.parentRepositoryURL = parentRepositoryURL
@@ -151,16 +183,65 @@ public struct WebsiteViewModel {
 
     private static func makeHomePage() -> HomePageViewModel {
         HomePageViewModel(
-            appName: "Portal",
-            badge: "Portal JSON Builder",
-            headline: "Create request JSON in the portal",
-            tagline: "This portal is where a user fills in the request details, generates a structured JSON case record, and prepares the conversation before any live session begins.",
-            architectureLine: "Start with the portal request builder first. The live browser session flow remains available as a secondary beta for equal-turn discussions.",
+            appName: "WelcomTalk",
+            appCaption: "Portal",
+            badge: "Introducing a new category",
+            headline: "A fairness-first way to prepare difficult conversations.",
+            tagline: "WelcomTalk Portal introduces a new market concept: start with a structured request, then move into equal-turn live dialogue only when both sides are ready.",
+            architectureLine: "Lead with the story, show the process, and let people try the structured request flow before the live beta begins.",
+            marketParagraphs: [
+                "WelcomTalk Portal is not just another chat tool. It is a guided entry point for difficult conversations — a place to slow the moment down, capture the issue clearly, and create a fairer starting point.",
+                "That matters because this is a new concept entering the market: structure first, then dialogue. Instead of sending people straight into a tense exchange, WelcomTalk Portal helps them arrive with context, clarity, and equal time in mind.",
+            ],
+            processSteps: [
+                ProcessStep(
+                    stepLabel: "Step 01",
+                    title: "Capture the request",
+                    body: "The user explains the issue, the people involved, and the desired outcome in one structured place."
+                ),
+                ProcessStep(
+                    stepLabel: "Step 02",
+                    title: "Generate the case record",
+                    body: "WelcomTalk Portal turns the intake into a clean JSON record that can support product workflows, human review, or app handoff later."
+                ),
+                ProcessStep(
+                    stepLabel: "Step 03",
+                    title: "Invite the other side",
+                    body: "Once the request is clear, the conversation can move forward with context already established instead of starting in confusion."
+                ),
+                ProcessStep(
+                    stepLabel: "Step 04",
+                    title: "Run an equal-turn session",
+                    body: "When a live discussion happens, everyone gets clear speaking order, equal time, and a neutral framework for follow-up."
+                ),
+            ],
+            audienceCards: [
+                FeatureCard(
+                    icon: "👤",
+                    title: "Individuals",
+                    body: "Use WelcomTalk Portal to turn a stressful situation into a structured request before a live conversation begins."
+                ),
+                FeatureCard(
+                    icon: "🤝",
+                    title: "Couples & Families",
+                    body: "Create a calmer starting point for emotionally charged conversations by organizing context before anyone starts talking over each other."
+                ),
+                FeatureCard(
+                    icon: "🏢",
+                    title: "Teams & Organizations",
+                    body: "Apply a fairness-first process to internal disputes, feedback loops, or moderated conversations that need more structure."
+                ),
+                FeatureCard(
+                    icon: "🎥",
+                    title: "Moderators & Studios",
+                    body: "Grow the concept into richer facilitated discussions, studio formats, or creator-led conversations over time."
+                ),
+            ],
             features: [
                 FeatureCard(
                     icon: "🧾",
                     title: "Request JSON Builder",
-                    body: "Fill in the request in the portal and generate a structured JSON record that can later feed the app or a backend workflow."
+                    body: "Fill in the request in WelcomTalk Portal and generate a structured JSON record that can later feed the app or a backend workflow."
                 ),
                 FeatureCard(
                     icon: "⚖️",
@@ -170,7 +251,7 @@ public struct WebsiteViewModel {
                 FeatureCard(
                     icon: "🧭",
                     title: "Neutral Structure",
-                    body: "The Portal does not decide who is right. It gives people a clear structure to present their side and respond."
+                    body: "WelcomTalk Portal does not decide who is right. It gives people a clear structure to present their side and respond."
                 ),
                 FeatureCard(
                     icon: "🌐",
@@ -185,16 +266,21 @@ public struct WebsiteViewModel {
                 FeatureCard(
                     icon: "🔒",
                     title: "Private by Design",
-                    body: "The portal can prepare the structured JSON record, while the iPhone app remains the most private path for sensitive live conversations."
+                    body: "WelcomTalk Portal can prepare the structured JSON record, while the iPhone app remains the most private path for sensitive live conversations."
                 ),
             ],
             aboutParagraphs: [
-                "The Portal starts here: the user fills in request details, adds supporting document names, and generates a structured JSON case record.",
-                "After the request is created, the platform can move into a fairness-first conversation flow with equal timed turns and structured follow-up.",
-                "The iPhone experience remains the most private path for live sessions: devices connect directly with Multipeer Connectivity and no relay is involved. The portal is the clearest place to prepare the JSON request record before that conversation starts.",
+                "WelcomTalk is being built by Wael Wahbeh as a new fairness-first product for introducing, preparing, and eventually hosting difficult conversations.",
+                "The goal is simple: reduce chaos at the beginning of a tense interaction by giving people a neutral structure before the live moment starts.",
+                "The iPhone app remains the most private path for live sessions, while WelcomTalk Portal serves as the public front door for explaining the concept, collecting the structured request, and inviting early adopters into the experience.",
             ],
+            contactParagraphs: [
+                "If you want to talk about partnerships, pilot programs, feedback, or early access, reach out.",
+                "WelcomTalk Portal is early, and thoughtful feedback from real users, mediators, creators, and teams can help shape where it goes next.",
+            ],
+            contactEmail: "wahbehw@me.com",
             sharedSessionSummary: demoSessionSummary(),
-            sharedSessionNote: "The snapshot below shows the shared equal-turn session model that can be used after the portal-generated request JSON has done its job.",
+            sharedSessionNote: "The snapshot below shows the shared equal-turn session model that can be used after the WelcomTalk Portal request JSON has done its job.",
             parentRepositoryURL: "https://github.com/waelio/WelcomTalk",
             parentRepositoryName: "iPhone app repo"
         )
@@ -205,21 +291,21 @@ public struct WebsiteViewModel {
             route: .privacy,
             title: "Privacy Policy",
             effectiveDate: "March 30, 2026",
-            highlight: "The iPhone app remains local and peer-to-peer. The portal beta may relay active session state through a lightweight server so two browsers can sync in real time.",
+            highlight: "The iPhone app remains local and peer-to-peer. The WelcomTalk Portal beta may relay active session state through a lightweight server so two browsers can sync in real time.",
             sections: [
                 LegalSection(
                     number: "1",
                     title: "Overview",
                     paragraphs: [
-                        "Portal is an iOS and web experience developed by Wael Wahbeh. This Privacy Policy describes how the iPhone app and the current portal experience handle your information.",
-                        "The iPhone app is designed to operate offline and peer-to-peer. The portal beta can host and join live browser sessions and may use a lightweight relay to synchronize the active session between browsers."
+                        "WelcomTalk Portal is an iOS and web experience developed by Wael Wahbeh. This Privacy Policy describes how the iPhone app and the current WelcomTalk Portal experience handle your information.",
+                        "The iPhone app is designed to operate offline and peer-to-peer. The WelcomTalk Portal beta can host and join live browser sessions and may use a lightweight relay to synchronize the active session between browsers."
                     ]
                 ),
                 LegalSection(
                     number: "2",
                     title: "Information We Do Not Collect",
                     paragraphs: [
-                        "Portal does not collect, transmit, or store any of the following:"
+                        "WelcomTalk Portal does not collect, transmit, or store any of the following:"
                     ],
                     bullets: [
                         "Personal identifiers (name, email, phone number, Apple ID)",
@@ -235,7 +321,7 @@ public struct WebsiteViewModel {
                     title: "Data Stored Locally on Your Device",
                     paragraphs: [
                         "The iPhone app stores session history and notes using Apple's Core Data framework, which writes exclusively to your device's local storage. This data is:",
-                        "The current portal beta keeps the active session in browser memory while the page is open and does not require an account."
+                        "The current WelcomTalk Portal beta keeps the active session in browser memory while the page is open and does not require an account."
                     ],
                     bullets: [
                         "Never transmitted to any server",
@@ -254,7 +340,7 @@ public struct WebsiteViewModel {
                     number: "5",
                     title: "Microphone and Speech Recognition",
                     paragraphs: [
-                        "If speech recognition is enabled (optional feature), the app uses Apple's on-device Speech framework to transcribe your speaking turn. Audio is processed locally on your device. No audio or transcription data is sent to any external server by the iPhone app or the portal.",
+                        "If speech recognition is enabled (optional feature), the app uses Apple's on-device Speech framework to transcribe your speaking turn. Audio is processed locally on your device. No audio or transcription data is sent to any external server by the iPhone app or WelcomTalk Portal.",
                         "Apple's Speech framework may route audio to Apple's servers depending on iOS settings. Please refer to Apple's Privacy Policy at https://www.apple.com/legal/privacy/ for details on their data practices."
                     ]
                 ),
@@ -263,7 +349,7 @@ public struct WebsiteViewModel {
                     title: "Real-Time Communication",
                     paragraphs: [
                         "On iPhone, session synchronization between devices uses Apple's Multipeer Connectivity framework (Bluetooth and local Wi-Fi). Communication is direct device-to-device — no data passes through any server operated by us or any third party.",
-                        "On the portal beta, active session state may be relayed through a lightweight WebSocket service so two browsers can stay in sync. If your conversation is highly sensitive, use the iPhone app instead of the current portal beta."
+                        "On the WelcomTalk Portal beta, active session state may be relayed through a lightweight WebSocket service so two browsers can stay in sync. If your conversation is highly sensitive, use the iPhone app instead of the current WelcomTalk Portal beta."
                     ]
                 ),
                 LegalSection(
@@ -277,7 +363,7 @@ public struct WebsiteViewModel {
                     number: "8",
                     title: "Third-Party Services",
                     paragraphs: [
-                        "Portal does not integrate with analytics, advertising, or profiling SDKs. The portal beta may use a lightweight relay host strictly to pass active session state between connected browsers."
+                        "WelcomTalk Portal does not integrate with analytics, advertising, or profiling SDKs. The WelcomTalk Portal beta may use a lightweight relay host strictly to pass active session state between connected browsers."
                     ]
                 ),
                 LegalSection(
@@ -291,7 +377,7 @@ public struct WebsiteViewModel {
                     number: "10",
                     title: "Changes to This Policy",
                     paragraphs: [
-                        "If this policy changes materially, an updated version will be posted at this URL with a revised effective date. As the portal beta evolves, this policy will be updated to describe the production web experience more precisely."
+                        "If this policy changes materially, an updated version will be posted at this URL with a revised effective date. As the WelcomTalk Portal beta evolves, this policy will be updated to describe the production web experience more precisely."
                     ]
                 ),
                 LegalSection(
@@ -318,7 +404,7 @@ public struct WebsiteViewModel {
                     number: "1",
                     title: "Acceptance",
                     paragraphs: [
-                        "By downloading, installing, or using the iPhone app or the Portal, you agree to be bound by these Terms of Use. If you do not agree, do not use the iPhone app or the Portal."
+                        "By downloading, installing, or using the iPhone app or WelcomTalk Portal, you agree to be bound by these Terms of Use. If you do not agree, do not use the iPhone app or WelcomTalk Portal."
                     ]
                 ),
                 LegalSection(
@@ -332,14 +418,14 @@ public struct WebsiteViewModel {
                     number: "3",
                     title: "Permitted Use",
                     paragraphs: [
-                        "The iPhone app and portal beta are intended to facilitate voluntary, structured, face-to-face or remote conversations between consenting adults. You agree to use them only for lawful purposes and in a manner consistent with their intended design."
+                        "The iPhone app and WelcomTalk Portal beta are intended to facilitate voluntary, structured, face-to-face or remote conversations between consenting adults. You agree to use them only for lawful purposes and in a manner consistent with their intended design."
                     ]
                 ),
                 LegalSection(
                     number: "4",
                     title: "Prohibited Use",
                     paragraphs: [
-                        "You must not use the iPhone app or portal to:"
+                        "You must not use the iPhone app or WelcomTalk Portal to:"
                     ],
                     bullets: [
                         "Record, capture, or transmit another person's voice without their knowledge and consent",
@@ -352,35 +438,35 @@ public struct WebsiteViewModel {
                     number: "5",
                     title: "Intellectual Property",
                     paragraphs: [
-                        "All content, design, code, and trademarks in the iPhone app and portal are the property of Wael Wahbeh. Nothing in these Terms grants you any right to use their names, logos, or trademarks without prior written permission."
+                        "All content, design, code, and trademarks in the iPhone app and WelcomTalk Portal are the property of Wael Wahbeh. Nothing in these Terms grants you any right to use their names, logos, or trademarks without prior written permission."
                     ]
                 ),
                 LegalSection(
                     number: "6",
                     title: "No Warranty",
                     paragraphs: [
-                        "The iPhone app and portal are provided as is and as available without warranties of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, or non-infringement. Wael Wahbeh does not warrant that the iPhone app or portal will be uninterrupted, error-free, or suitable for any specific purpose."
+                        "The iPhone app and WelcomTalk Portal are provided as is and as available without warranties of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, or non-infringement. Wael Wahbeh does not warrant that the iPhone app or WelcomTalk Portal will be uninterrupted, error-free, or suitable for any specific purpose."
                     ]
                 ),
                 LegalSection(
                     number: "7",
                     title: "Limitation of Liability",
                     paragraphs: [
-                        "To the fullest extent permitted by law, Wael Wahbeh shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the iPhone app or portal, even if advised of the possibility of such damages. The total liability in any matter related to the iPhone app or portal is limited to the amount you paid for the iPhone app (if any)."
+                        "To the fullest extent permitted by law, Wael Wahbeh shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the iPhone app or WelcomTalk Portal, even if advised of the possibility of such damages. The total liability in any matter related to the iPhone app or WelcomTalk Portal is limited to the amount you paid for the iPhone app (if any)."
                     ]
                 ),
                 LegalSection(
                     number: "8",
                     title: "Third-Party Frameworks",
                     paragraphs: [
-                        "The iPhone app uses Apple platform frameworks (Multipeer Connectivity, Speech, EventKit, Core Data). The portal beta uses standard browser capabilities and may rely on a lightweight real-time relay to synchronize live sessions. Your use of those frameworks and browser services is additionally subject to the relevant platform terms and policies."
+                        "The iPhone app uses Apple platform frameworks (Multipeer Connectivity, Speech, EventKit, Core Data). The WelcomTalk Portal beta uses standard browser capabilities and may rely on a lightweight real-time relay to synchronize live sessions. Your use of those frameworks and browser services is additionally subject to the relevant platform terms and policies."
                     ]
                 ),
                 LegalSection(
                     number: "9",
                     title: "Disclaimer on Sensitive Conversations",
                     paragraphs: [
-                        "The iPhone app and Portal are communication tools only. They are not a substitute for professional legal, psychological, or mediation services. For disputes involving legal rights, domestic safety, or mental health, please consult qualified professionals."
+                        "The iPhone app and WelcomTalk Portal are communication tools only. They are not a substitute for professional legal, psychological, or mediation services. For disputes involving legal rights, domestic safety, or mental health, please consult qualified professionals."
                     ]
                 ),
                 LegalSection(
@@ -394,7 +480,7 @@ public struct WebsiteViewModel {
                     number: "11",
                     title: "Changes to These Terms",
                     paragraphs: [
-                        "We reserve the right to update these Terms at any time. An updated version will be posted at this URL with a revised effective date. Continued use of the iPhone app or portal after changes constitutes acceptance of the new Terms."
+                        "We reserve the right to update these Terms at any time. An updated version will be posted at this URL with a revised effective date. Continued use of the iPhone app or WelcomTalk Portal after changes constitutes acceptance of the new Terms."
                     ]
                 ),
                 LegalSection(
