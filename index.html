@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WelcomTalk – One Voice at a Time</title>
+    <title>WelcomTalk – Website Request JSON Builder</title>
     <style>
       *,
       *::before,
@@ -106,6 +106,106 @@
       .about p + p {
         margin-top: 12px;
       }
+      .request-builder {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 56px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .request-builder p.helper {
+        color: #8fa0c0;
+        line-height: 1.7;
+        margin-bottom: 20px;
+      }
+      .request-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .field.full {
+        grid-column: 1 / -1;
+      }
+      .field label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        color: #d8c890;
+        text-transform: uppercase;
+      }
+      .field input,
+      .field textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font: inherit;
+      }
+      .field textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      .field input[type="file"] {
+        padding: 12px;
+      }
+      .consent-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 18px;
+        color: #c9d3e8;
+      }
+      .consent-row input {
+        margin-top: 4px;
+      }
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .action-button {
+        border: 0;
+        border-radius: 14px;
+        padding: 12px 18px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        background: #c9a84c;
+        color: #0d1f3c;
+      }
+      .action-button.secondary {
+        background: rgba(255, 255, 255, 0.07);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .status-line {
+        margin-top: 16px;
+        color: #8fa0c0;
+        font-size: 0.92rem;
+      }
+      .json-output {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #f2f5ff;
+        overflow: auto;
+        line-height: 1.6;
+        font-size: 0.85rem;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        white-space: pre-wrap;
+      }
       footer {
         text-align: center;
         padding: 32px 24px;
@@ -131,59 +231,166 @@
     <div data-static-page>
       <header>
         <h1>Welcom<span>Talk</span></h1>
-        <p>One Voice at a Time</p>
-        <span class="badge">Available on the App Store</span>
+        <p>Create request JSON on the web</p>
+        <span class="badge">Website JSON Builder</span>
       </header>
 
       <main>
+        <div class="request-builder">
+          <div class="section-title">Create request JSON</div>
+          <p class="helper">
+            This website is where the user fills in the request details and
+            generates the JSON case record. The live conversation flow can come
+            later; the website should prepare the structured request first.
+          </p>
+
+          <div class="request-grid">
+            <div class="field">
+              <label for="request-full-name">Full Name</label>
+              <input
+                id="request-full-name"
+                type="text"
+                placeholder="Jordan Smith"
+              />
+            </div>
+
+            <div class="field">
+              <label for="request-topic">Topic</label>
+              <input
+                id="request-topic"
+                type="text"
+                placeholder="Repair dispute"
+              />
+            </div>
+
+            <div class="field full">
+              <label for="request-summary">Request Summary</label>
+              <textarea
+                id="request-summary"
+                placeholder="Explain the issue or desired outcome"
+              ></textarea>
+            </div>
+
+            <div class="field full">
+              <label for="request-documents">Supporting Documents</label>
+              <input id="request-documents" type="file" multiple />
+            </div>
+
+            <div class="field full">
+              <label for="request-notes">Additional Notes</label>
+              <textarea
+                id="request-notes"
+                placeholder="Optional notes"
+              ></textarea>
+            </div>
+          </div>
+
+          <label class="consent-row" for="request-consent">
+            <input id="request-consent" type="checkbox" />
+            <span
+              >I agree to submit this information for review and generate the
+              JSON record on the website.</span
+            >
+          </label>
+
+          <div class="button-row">
+            <button
+              class="action-button"
+              id="generate-request-json"
+              type="button"
+            >
+              Generate JSON
+            </button>
+            <button
+              class="action-button secondary"
+              id="copy-request-json"
+              type="button"
+            >
+              Copy JSON
+            </button>
+            <button
+              class="action-button secondary"
+              id="download-request-json"
+              type="button"
+            >
+              Download JSON
+            </button>
+          </div>
+
+          <p class="status-line" id="request-json-status">
+            Fill in the request details and consent to generate the JSON record.
+          </p>
+
+          <pre class="json-output" id="request-json-output">
+JSON preview appears here after generation.</pre
+          >
+        </div>
+
+        <div class="about" style="margin-bottom: 32px">
+          <div class="section-title">Fair by design</div>
+          <p>
+            WelcomTalk starts by creating a structured request record on the
+            website, then stays neutral in live conversations: one person speaks
+            at a time, everyone gets an equal timed turn, and every participant
+            has a fair chance to present their side.
+          </p>
+          <p>
+            The current live web beta mirrors the two-person session engine used
+            today, while the broader product direction stays open to
+            individuals, moderated discussions, and studio-style formats over
+            time.
+          </p>
+        </div>
+
         <div class="features">
           <div class="feature">
-            <div class="icon">🎙️</div>
-            <h3>Structured Turns</h3>
+            <div class="icon">🧾</div>
+            <h3>Request JSON Builder</h3>
             <p>
-              Each party speaks for a set time without interruption — calm,
-              focused conversation.
+              Fill in the request on the website and generate a structured JSON
+              record that can later feed the app or a backend workflow.
             </p>
           </div>
           <div class="feature">
-            <div class="icon">📡</div>
-            <h3>Peer-to-Peer</h3>
+            <div class="icon">⚖️</div>
+            <h3>Equal Time</h3>
             <p>
-              On iPhone, sessions stay device-to-device with Multipeer. On the
-              web beta, a lightweight relay keeps browsers in sync in real time.
+              When a live session happens, each participant gets the same timed
+              speaking window by default.
             </p>
           </div>
           <div class="feature">
-            <div class="icon">⏸️</div>
-            <h3>Grace &amp; Pause</h3>
+            <div class="icon">🧭</div>
+            <h3>Neutral Structure</h3>
             <p>
-              A 15-second grace period before each turn. Pause anytime when you
-              need a moment.
+              WelcomTalk does not decide who is right. It gives people a clear
+              structure to present their side and respond.
             </p>
           </div>
           <div class="feature">
-            <div class="icon">📅</div>
-            <h3>Schedule Together</h3>
+            <div class="icon">🌐</div>
+            <h3>Live Browser Beta</h3>
             <p>
-              Propose and confirm follow-up meetings directly in the app — added
-              to your calendar.
+              After the request record is created, today’s web beta can host one
+              equal-turn session with a host and one guest.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="icon">🎬</div>
+            <h3>Individuals to Studios</h3>
+            <p>
+              The concept starts with individual request intake today and can
+              grow into richer moderated discussions and studio-style formats
+              later.
             </p>
           </div>
           <div class="feature">
             <div class="icon">🔒</div>
-            <h3>Private &amp; Offline</h3>
+            <h3>Private by Design</h3>
             <p>
-              The iPhone app stays local-first. The browser beta is
-              server-assisted today, so sensitive conversations still belong in
-              the native app.
-            </p>
-          </div>
-          <div class="feature">
-            <div class="icon">📱</div>
-            <h3>QR Join</h3>
-            <p>
-              The host creates a session; guests can join from iPhone with QR or
-              from the web with a shareable code and invite link.
+              The website can prepare the structured JSON record, while the
+              iPhone app remains the most private path for sensitive live
+              conversations.
             </p>
           </div>
         </div>
@@ -192,21 +399,19 @@
           <div class="section-title">About</div>
           <p>
             WelcomTalk (displayed as <strong>Safe Talk</strong> on your device)
-            is an iOS app designed to facilitate fair, structured conversations
-            between two people — whether resolving a dispute, having a difficult
-            discussion, or simply ensuring both voices are heard equally.
+            starts on the website: the user fills in request details, adds
+            supporting documents, and generates a structured JSON case record.
           </p>
           <p>
-            The iPhone experience remains the most private path: devices
-            communicate directly with Multipeer Connectivity and no relay is
-            involved. The browser beta adds a smart web flow so one person can
-            start a session, share a link, and let the other person in from
-            another browser.
+            After the request is created, the platform can move into a
+            fairness-first conversation flow with equal timed turns and
+            structured follow-up.
           </p>
           <p>
-            Built with SwiftUI for iOS 16+ by <strong>Wael Wahbeh</strong>, and
-            mirrored on the web with SwiftWasm + Tokamak plus a lightweight
-            real-time relay for browser sessions.
+            The iPhone experience remains the most private path for live
+            sessions: devices communicate directly with Multipeer Connectivity
+            and no relay is involved. The website is the clearest place to
+            prepare the JSON request record before that conversation starts.
           </p>
         </div>
       </main>
@@ -219,5 +424,151 @@
         <p style="margin-top: 12px">© 2026 Wael Wahbeh. All rights reserved.</p>
       </footer>
     </div>
+
+    <script>
+      (() => {
+        const fullName = document.getElementById("request-full-name");
+        const topic = document.getElementById("request-topic");
+        const summary = document.getElementById("request-summary");
+        const documents = document.getElementById("request-documents");
+        const notes = document.getElementById("request-notes");
+        const consent = document.getElementById("request-consent");
+        const generateButton = document.getElementById("generate-request-json");
+        const copyButton = document.getElementById("copy-request-json");
+        const downloadButton = document.getElementById("download-request-json");
+        const statusLine = document.getElementById("request-json-status");
+        const output = document.getElementById("request-json-output");
+
+        if (
+          !fullName ||
+          !topic ||
+          !summary ||
+          !documents ||
+          !notes ||
+          !consent ||
+          !generateButton ||
+          !copyButton ||
+          !downloadButton ||
+          !statusLine ||
+          !output
+        ) {
+          return;
+        }
+
+        let latestJSON = "";
+
+        const inferContentType = (file) => {
+          if (file.type) return file.type;
+
+          const ext = (file.name.split(".").pop() || "").toLowerCase();
+          const map = {
+            pdf: "application/pdf",
+            png: "image/png",
+            jpg: "image/jpeg",
+            jpeg: "image/jpeg",
+            doc: "application/msword",
+            docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            txt: "text/plain",
+          };
+
+          return map[ext] || "application/octet-stream";
+        };
+
+        const storageComponent = (value) => {
+          const safe = value
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9._-]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+
+          return safe || "attachment";
+        };
+
+        const buildRecord = () => {
+          const trimmedName = fullName.value.trim();
+          const trimmedTopic = topic.value.trim();
+          const trimmedSummary = summary.value.trim();
+
+          if (
+            !trimmedName ||
+            !trimmedTopic ||
+            !trimmedSummary ||
+            !consent.checked
+          ) {
+            statusLine.textContent =
+              "Fill in full name, topic, request summary, and consent before generating JSON.";
+            return null;
+          }
+
+          const files = Array.from(documents.files || []);
+          const requestId =
+            globalThis.crypto &&
+            typeof globalThis.crypto.randomUUID === "function"
+              ? globalThis.crypto.randomUUID()
+              : `request-${Date.now()}`;
+
+          return {
+            requestId,
+            createdAt: new Date().toISOString(),
+            source: "website",
+            fullName: trimmedName,
+            topic: trimmedTopic,
+            summary: trimmedSummary,
+            additionalNotes: notes.value.trim(),
+            status: "submitted",
+            attachments: files.map((file) => ({
+              fileName: file.name,
+              contentType: inferContentType(file),
+              storageRef: `pending-upload/${storageComponent(file.name)}`,
+            })),
+          };
+        };
+
+        generateButton.addEventListener("click", () => {
+          const record = buildRecord();
+          if (!record) {
+            latestJSON = "";
+            output.textContent = "JSON preview appears here after generation.";
+            return;
+          }
+
+          latestJSON = JSON.stringify(record, null, 2);
+          output.textContent = latestJSON;
+          statusLine.textContent = "JSON generated locally in the website.";
+        });
+
+        copyButton.addEventListener("click", async () => {
+          if (!latestJSON) {
+            statusLine.textContent = "Generate the JSON first, then copy it.";
+            return;
+          }
+
+          try {
+            await navigator.clipboard.writeText(latestJSON);
+            statusLine.textContent = "JSON copied to the clipboard.";
+          } catch (error) {
+            statusLine.textContent =
+              "Clipboard access is not available here, but the JSON preview is ready to copy manually.";
+          }
+        });
+
+        downloadButton.addEventListener("click", () => {
+          if (!latestJSON) {
+            statusLine.textContent =
+              "Generate the JSON first, then download it.";
+            return;
+          }
+
+          const blob = new Blob([latestJSON], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = "welcomtalk-request.json";
+          anchor.click();
+          URL.revokeObjectURL(url);
+          statusLine.textContent = "JSON downloaded from the website.";
+        });
+      })();
+    </script>
   </body>
 </html>

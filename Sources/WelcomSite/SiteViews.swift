@@ -1,3 +1,4 @@
+import Foundation
 import TokamakShim
 import WelcomShared
 import WelcomSiteCore
@@ -49,6 +50,7 @@ struct WebsiteRootView: View {
 
 struct HomePageView: View {
     let viewModel: HomePageViewModel
+    @StateObject private var requestStore = RequestJSONStore()
     @StateObject private var sessionStore = SmartSessionStore()
 
     private let featureColumns = [
@@ -112,6 +114,18 @@ struct HomePageView: View {
             .cornerRadius(24)
 
             VStack(alignment: .leading, spacing: 16) {
+                SectionHeading(title: "Create request JSON")
+
+                RequestJSONBuilderView(requestStore: requestStore)
+            }
+
+            SessionCalloutBox(
+                heading: "Fair by design",
+                detail: "WelcomTalk starts with a structured request record on the website, then stays neutral in live sessions: one person speaks at a time, everyone gets equal timed turns by default, and every participant has space to present their side.",
+                accentColor: SitePalette.accent
+            )
+
+            VStack(alignment: .leading, spacing: 16) {
                 SectionHeading(title: "Live web session beta")
 
                 SmartSessionWorkbenchView(sessionStore: sessionStore)
@@ -156,6 +170,82 @@ struct HomePageView: View {
                         .stroke(SitePalette.border, lineWidth: 1)
                 )
                 .cornerRadius(20)
+            }
+        }
+    }
+}
+
+struct RequestJSONBuilderView: View {
+    @ObservedObject var requestStore: RequestJSONStore
+
+    var body: some View {
+        SmartCardShell(
+            title: "Website request form",
+            subtitle: "This is the website flow where a user fills in the request and creates the JSON case record."
+        ) {
+            VStack(alignment: .leading, spacing: 14) {
+                StyledTextInput(title: "Full name", text: $requestStore.fullName)
+                StyledTextInput(title: "Topic", text: $requestStore.topic)
+                StyledTextInput(title: "Request summary", text: $requestStore.summary)
+                StyledTextInput(title: "Supporting document names (comma separated)", text: $requestStore.supportingDocumentNamesLine)
+                StyledTextInput(title: "Additional notes", text: $requestStore.additionalNotes)
+
+                RequestConsentRow(isSelected: $requestStore.hasConsent)
+
+                SessionCalloutBox(
+                    heading: "Form note",
+                    detail: "The website preview currently lists supporting documents by name inside the generated JSON. Real upload and storage wiring can be connected later without changing the request structure.",
+                    accentColor: SitePalette.accentMuted
+                )
+
+                HStack(spacing: 12) {
+                    WideActionButton(
+                        title: "Generate JSON",
+                        style: .filled,
+                        isDisabled: !requestStore.canGenerate,
+                        action: requestStore.generateJSON
+                    )
+
+                    WideActionButton(
+                        title: "Copy JSON",
+                        style: .outline,
+                        isDisabled: requestStore.generatedJSON.isEmpty,
+                        action: requestStore.copyJSON
+                    )
+                }
+
+                if let statusMessage = requestStore.statusMessage {
+                    HStack(spacing: 10) {
+                        Text(statusMessage)
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundColor(SitePalette.textSecondary)
+
+                        if requestStore.didCopyJSON {
+                            StatusPill(title: "Copied", isAccent: false)
+                        }
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("JSON preview")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(SitePalette.accentMuted)
+
+                    ScrollView {
+                        Text(requestStore.generatedJSONPlaceholderOrValue)
+                            .font(.system(size: 13, weight: .regular, design: .monospaced))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(14)
+                    }
+                    .frame(minHeight: 220)
+                    .background(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(SitePalette.border.opacity(0.7), lineWidth: 1)
+                    )
+                    .cornerRadius(14)
+                }
             }
         }
     }
@@ -343,6 +433,7 @@ struct SessionSnapshotCard: View {
             VStack(alignment: .leading, spacing: 12) {
                 SnapshotMetricRow(label: "Status", value: summary.statusText)
                 SnapshotMetricRow(label: "Current speaker", value: "\(summary.currentSpeakerName) (\(summary.currentSpeakerRole))")
+                SnapshotMetricRow(label: "Fairness", value: summary.fairnessLine)
                 SnapshotMetricRow(label: "Turn progress", value: summary.turnProgressText)
                 SnapshotMetricRow(label: "Turn duration", value: summary.turnDurationText)
                 SnapshotMetricRow(label: "Participants", value: summary.participantsLine)
@@ -377,6 +468,12 @@ struct SmartSessionWorkbenchView: View {
                 .font(.system(size: 15, weight: .regular))
                 .foregroundColor(SitePalette.textSecondary)
 
+            SessionCalloutBox(
+                heading: "Current web scope",
+                detail: "Today's live browser beta supports one host and one guest with equal timed turns. The wider product idea stays flexible so the format can grow over time.",
+                accentColor: SitePalette.accentMuted
+            )
+
             if let error = sessionStore.errorMessage {
                 SessionCalloutBox(
                     heading: "Connection note",
@@ -387,13 +484,13 @@ struct SmartSessionWorkbenchView: View {
 
             if sessionStore.session == nil {
                 VStack(alignment: .leading, spacing: 16) {
-                    SmartCardShell(title: "Host a live session", subtitle: "Start on one browser, then share the invite link or the six-character code.") {
+                    SmartCardShell(title: "Host a live session", subtitle: "Start on one browser, then share the invite link or the six-character code. The current beta uses equal timed turns for one host and one guest.") {
                         VStack(alignment: .leading, spacing: 12) {
                             StyledTextInput(title: "Conversation topic", text: $sessionStore.hostTopic)
                             StyledTextInput(title: "Your name", text: $sessionStore.hostName)
 
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("Rounds per person")
+                                Text("Equal rounds per participant")
                                     .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(SitePalette.accentMuted)
 
@@ -410,7 +507,7 @@ struct SmartSessionWorkbenchView: View {
                             }
 
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("Seconds per turn")
+                                Text("Equal seconds per turn")
                                     .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(SitePalette.accentMuted)
 
@@ -475,6 +572,7 @@ struct SmartSessionWorkbenchView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 SnapshotMetricRow(label: "Status", value: summary.statusText)
                                 SnapshotMetricRow(label: "Current speaker", value: "\(summary.currentSpeakerName) (\(summary.currentSpeakerRole))")
+                                SnapshotMetricRow(label: "Fairness", value: summary.fairnessLine)
                                 SnapshotMetricRow(label: "Turn progress", value: summary.turnProgressText)
                                 SnapshotMetricRow(label: "Time remaining", value: sessionStore.countdownText)
                                 SnapshotMetricRow(label: "Participants", value: summary.participantsLine)
@@ -599,6 +697,35 @@ struct StyledTextInput: View {
                 )
                 .cornerRadius(14)
         }
+    }
+}
+
+struct RequestConsentRow: View {
+    @Binding var isSelected: Bool
+
+    var body: some View {
+        Button {
+            isSelected.toggle()
+        } label: {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: isSelected ? "checkmark.square.fill" : "square")
+                    .foregroundColor(isSelected ? SitePalette.accent : SitePalette.textSecondary)
+                    .font(.system(size: 18, weight: .semibold))
+
+                Text("I agree to submit this information for review and generate the JSON record on the website.")
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(14)
+            .background(Color.white.opacity(0.03))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(SitePalette.border.opacity(0.7), lineWidth: 1)
+            )
+            .cornerRadius(14)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -806,5 +933,65 @@ struct FooterLinkButton: View {
                 )
                 .cornerRadius(12)
         }
+    }
+}
+
+final class RequestJSONStore: ObservableObject {
+    @Published var fullName: String = ""
+    @Published var topic: String = ""
+    @Published var summary: String = ""
+    @Published var supportingDocumentNamesLine: String = ""
+    @Published var additionalNotes: String = ""
+    @Published var hasConsent: Bool = false
+    @Published private(set) var generatedJSON: String = ""
+    @Published private(set) var statusMessage: String? = "Fill in the request details and consent to generate the JSON record."
+    @Published private(set) var didCopyJSON = false
+
+    var canGenerate: Bool {
+        draft.canGenerate
+    }
+
+    var generatedJSONPlaceholderOrValue: String {
+        if generatedJSON.isEmpty {
+            return "JSON preview appears here after you generate the request record."
+        }
+
+        return generatedJSON
+    }
+
+    private var draft: RequestFormDraft {
+        RequestFormDraft(
+            fullName: fullName,
+            topic: topic,
+            summary: summary,
+            supportingDocumentNamesLine: supportingDocumentNamesLine,
+            additionalNotes: additionalNotes,
+            hasConsent: hasConsent
+        )
+    }
+
+    func generateJSON() {
+        guard let json = draft.generatedJSONPreview() else {
+            statusMessage = "Fill in full name, topic, request summary, and consent before generating JSON."
+            generatedJSON = ""
+            didCopyJSON = false
+            return
+        }
+
+        generatedJSON = json
+        statusMessage = "JSON generated locally in the website."
+        didCopyJSON = false
+    }
+
+    func copyJSON() {
+        guard !generatedJSON.isEmpty else {
+            statusMessage = "Generate the JSON first, then copy it."
+            didCopyJSON = false
+            return
+        }
+
+        BrowserSupport.copyToClipboard(generatedJSON)
+        statusMessage = "JSON copied to the clipboard."
+        didCopyJSON = true
     }
 }

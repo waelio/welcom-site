@@ -74,15 +74,15 @@ final class SmartSessionStore: ObservableObject {
 
         if session.status == .waiting {
             return isHostSession
-                ? "Share the invite and approve your guest when they appear."
-                : "Waiting for the host to let you in."
+                ? "Share the invite and approve your guest when you're ready to start equal turns."
+                : "Waiting for the host to let you into the equal-time session."
         }
 
         return "\(formatted(seconds: timeRemaining)) remaining in this turn"
     }
 
     var betaNotice: String {
-        "Web beta uses a lightweight relay to sync browsers in real time. For the most private setup, the iPhone app still uses local Multipeer sessions."
+        "Web beta uses a lightweight relay to sync browsers in real time. Today it mirrors the equal-turn two-participant session model, while the iPhone app remains the most private path with local Multipeer sessions."
     }
 
     func createSession() {

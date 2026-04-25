@@ -9,7 +9,7 @@ public enum SiteRoute: String, CaseIterable {
     public var title: String {
         switch self {
         case .home:
-            return "WelcomTalk – One Voice at a Time"
+            return "WelcomTalk – Website Request JSON Builder"
         case .privacy:
             return "Privacy Policy – WelcomTalk"
         case .terms:
@@ -152,49 +152,49 @@ public struct WebsiteViewModel {
     private static func makeHomePage() -> HomePageViewModel {
         HomePageViewModel(
             appName: "WelcomTalk",
-            badge: "SwiftWasm + Tokamak",
-            headline: "One Voice at a Time",
-            tagline: "A Swift-powered web experience that can now host live browser sessions while still sharing portable models with the iPhone app.",
-            architectureLine: "The browser beta uses the same shared Session model as the parent app, while the iPhone version keeps its local Multipeer experience.",
+            badge: "Website JSON Builder",
+            headline: "Create request JSON on the web",
+            tagline: "This website is where a user fills in the request details, generates a structured JSON case record, and prepares the conversation before any live session begins.",
+            architectureLine: "Start with the website request builder first. The live browser session flow remains available as a secondary beta for equal-turn discussions.",
             features: [
                 FeatureCard(
-                    icon: "🎙️",
-                    title: "Structured Turns",
-                    body: "Each party speaks for a set time without interruption — calm, focused conversation."
+                    icon: "🧾",
+                    title: "Request JSON Builder",
+                    body: "Fill in the request on the website and generate a structured JSON record that can later feed the app or a backend workflow."
                 ),
                 FeatureCard(
-                    icon: "📡",
-                    title: "Peer-to-Peer",
-                    body: "On iPhone, sessions stay device-to-device with Multipeer. On the web beta, a lightweight relay keeps browsers in sync in real time."
+                    icon: "⚖️",
+                    title: "Equal Time",
+                    body: "When a live session happens, each participant gets the same timed speaking window by default."
                 ),
                 FeatureCard(
-                    icon: "⏸️",
-                    title: "Grace & Pause",
-                    body: "A 15-second grace period before each turn. Pause anytime when you need a moment."
+                    icon: "🧭",
+                    title: "Neutral Structure",
+                    body: "WelcomTalk does not decide who is right. It gives people a clear structure to present their side and respond."
                 ),
                 FeatureCard(
-                    icon: "📅",
-                    title: "Schedule Together",
-                    body: "Propose and confirm follow-up meetings directly in the app — added to your calendar."
+                    icon: "🌐",
+                    title: "Live Browser Beta",
+                    body: "After the request record is created, today's web beta can host one equal-turn session with a host and one guest."
+                ),
+                FeatureCard(
+                    icon: "🎬",
+                    title: "Individuals to Studios",
+                    body: "The concept starts with individual request intake today and can grow into richer moderated discussions and studio-style formats later."
                 ),
                 FeatureCard(
                     icon: "🔒",
-                    title: "Private & Offline",
-                    body: "The iPhone app stays local-first. The browser beta is server-assisted today, so sensitive conversations still belong in the native app."
-                ),
-                FeatureCard(
-                    icon: "📱",
-                    title: "QR Join",
-                    body: "The host creates a session; guests can join from iPhone with QR or from the web with a shareable code and invite link."
+                    title: "Private by Design",
+                    body: "The website can prepare the structured JSON record, while the iPhone app remains the most private path for sensitive live conversations."
                 ),
             ],
             aboutParagraphs: [
-                "WelcomTalk (displayed as Safe Talk on your device) began as an iPhone app for fair, structured conversations between two people — whether resolving a dispute, having a difficult discussion, or simply ensuring both voices are heard equally.",
-                "The iPhone experience remains the most private path: devices connect directly with Multipeer Connectivity and no relay is involved. The browser beta adds a smart web flow so one person can start a session, share a link, and let the other person in from another browser.",
-                "Built with SwiftUI for iOS 16+ by Wael Wahbeh, and mirrored on the web with SwiftWasm + Tokamak plus a lightweight real-time relay for browser sessions.",
+                "WelcomTalk starts on the website: the user fills in request details, adds supporting document names, and generates a structured JSON case record.",
+                "After the request is created, the platform can move into a fairness-first conversation flow with equal timed turns and structured follow-up.",
+                "The iPhone experience remains the most private path for live sessions: devices connect directly with Multipeer Connectivity and no relay is involved. The website is the clearest place to prepare the JSON request record before that conversation starts.",
             ],
             sharedSessionSummary: demoSessionSummary(),
-            sharedSessionNote: "The snapshot below comes from a real shared Swift package dependency on the parent app, not a hand-copied web-only model.",
+            sharedSessionNote: "The snapshot below shows the shared equal-turn session model that can be used after the website-generated request JSON has done its job.",
             parentRepositoryURL: "https://github.com/waelio/WelcomTalk",
             parentRepositoryName: "waelio/WelcomTalk"
         )
