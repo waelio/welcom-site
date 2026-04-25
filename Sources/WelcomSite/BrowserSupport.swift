@@ -8,7 +8,9 @@ import JavaScriptKit
 enum BrowserSupport {
     static func currentRoute() -> SiteRoute {
         #if os(WASI)
-        if let rawRoute = JSObject.global["__WELCOM_PAGE__"].string,
+        if let document = JSObject.global.document.object,
+           let body = document.body.object,
+           let rawRoute = body["dataset"].object?["welcomPage"].string,
            let route = SiteRoute(rawValue: rawRoute) {
             return route
         }
