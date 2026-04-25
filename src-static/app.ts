@@ -20,8 +20,12 @@ type WebsiteRequestRecord = {
     topic: string;
     summary: string;
     additionalNotes: string;
-    status: "submitted";
+    status: "submitted" | "imported" | "started";
     attachments: WebsiteRequestAttachment[];
+    importedAt?: string;
+    startedAt?: string;
+    hostDisplayName?: string;
+    sessionCode?: string;
 };
 
 type AuthenticateJasonPreset = {
@@ -32,11 +36,11 @@ type AuthenticateJasonPreset = {
 };
 
 type PortalStartPayload = {
-    requestId: string;
-    fullName: string;
-    topic: string;
-    summary: string;
-    additionalNotes: string;
+    requestId?: string;
+    fullName?: string;
+    topic?: string;
+    summary?: string;
+    additionalNotes?: string;
 };
 
 const STATIC_SHELL_MESSAGE =
@@ -45,7 +49,9 @@ const STATIC_SHELL_MESSAGE =
 const PORTAL_START_QUERY_FLAG = "portalStart";
 const PORTAL_START_SCHEME = "welcomtalk://portal-start";
 const DEFAULT_PORTAL_ORIGIN = "https://welcomeport.netlify.app/";
+const DEFAULT_PORTAL_API_ORIGIN = "https://waelio-messaging.onrender.com";
 const AUTO_OPEN_SESSION_STORAGE_PREFIX = "welcomtalk-portal-start:auto-open:";
+const PORTAL_SYNC_POLL_INTERVAL_MS = 2500;
 
 const AUTHENTICATE_JASON_PRESET: AuthenticateJasonPreset = {
     fullName: "Jordan Smith",
@@ -67,18 +73,70 @@ const resolvePortalOrigin = (): string => {
     return DEFAULT_PORTAL_ORIGIN;
 };
 
+const resolvePortalAPIOrigin = (): string => {
+    if (typeof window !== "undefined") {
+        const host = window.location.hostname.toLowerCase();
+
+        if (host === "localhost" || host === "127.0.0.1") {
+            return "http://localhost:8080";
+        }
+    }
+
+    return DEFAULT_PORTAL_API_ORIGIN;
+};
+
 const normalizePortalValue = (value: string): string =>
     value.trim();
 
-const buildPortalStartPayload = (
+const buildStoredPortalStartPayload = (
     record: WebsiteRequestRecord,
 ): PortalStartPayload => ({
     requestId: record.requestId,
+});
+
+const buildInlinePortalStartPayload = (
+    record: WebsiteRequestRecord,
+): PortalStartPayload => ({
     fullName: normalizePortalValue(record.fullName),
     topic: normalizePortalValue(record.topic),
     summary: normalizePortalValue(record.summary),
     additionalNotes: normalizePortalValue(record.additionalNotes),
 });
+
+const hasInlinePortalPayload = (
+    payload: PortalStartPayload,
+): payload is Required<Pick<PortalStartPayload, "fullName" | "topic" | "summary">> & PortalStartPayload => {
+    const fullName = normalizePortalValue(payload.fullName || "");
+    const topic = normalizePortalValue(payload.topic || "");
+    const summary = normalizePortalValue(payload.summary || "");
+
+    return Boolean(fullName && topic && summary);
+};
+
+const qrQueryParamsForPortalPayload = (
+    payload: PortalStartPayload,
+): URLSearchParams => {
+    const params = new URLSearchParams();
+
+    if (payload.requestId) {
+        params.set("rid", payload.requestId);
+        return params;
+    }
+
+    if (!hasInlinePortalPayload(payload)) {
+        return params;
+    }
+
+    params.set("n", payload.fullName);
+    params.set("t", payload.topic);
+    params.set("s", payload.summary);
+
+    if (payload.additionalNotes) {
+        params.set("a", payload.additionalNotes);
+    }
+
+    return params;
+};
 
 const portalQueryParams = (
     payload: PortalStartPayload,
@@ -90,7 +148,14 @@ const portalQueryParams = (
         params.set(PORTAL_START_QUERY_FLAG, "1");
     }
 
-    params.set("rid", payload.requestId);
+    if (payload.requestId) {
+        params.set("rid", payload.requestId);
+    }
+
+    if (!hasInlinePortalPayload(payload)) {
+        return params;
+    }
+
     params.set("n", payload.fullName);
     params.set("t", payload.topic);
     params.set("s", payload.summary);
@@ -106,12 +171,66 @@ const customSchemeURLForPortalPayload = (
     payload: PortalStartPayload,
 ): string => `${PORTAL_START_SCHEME}?${portalQueryParams(payload, false).toString()}`;
 
+const qrCodeURLForPortalPayload = (
+    payload: PortalStartPayload,
+): string => `${PORTAL_START_SCHEME}?${qrQueryParamsForPortalPayload(payload).toString()}`;
+
 const landingURLForPortalPayload = (
     payload: PortalStartPayload,
 ): string => {
-    const landingURL = new URL("/", resolvePortalOrigin());
-    landingURL.search = portalQueryParams(payload, true).toString();
+    const landingURL = new URL("/portal-start", resolvePortalOrigin());
+    landingURL.search = portalQueryParams(payload, false).toString();
     return landingURL.toString();
+};
+
+const submitPortalRequest = async (
+    record: WebsiteRequestRecord,
+): Promise<WebsiteRequestRecord> => {
+    const endpoint = new URL("/api/portal-requests", resolvePortalAPIOrigin());
+    const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: JSON.stringify(record),
+    });
+
+    if (!response.ok) {
+        let message = `Portal request upload failed with status ${response.status}.`;
+
+        try {
+            const payload = (await response.json()) as { error?: string };
+            if (typeof payload.error === "string" && payload.error.trim()) {
+                message = payload.error;
+            }
+        } catch {
+            // Ignore JSON parsing errors and keep the generic status message.
+        }
+
+        throw new Error(message);
+    }
+
+    return (await response.json()) as WebsiteRequestRecord;
+};
+
+const fetchPortalRequest = async (
+    requestId: string,
+): Promise<WebsiteRequestRecord> => {
+    const endpoint = new URL(`/api/portal-requests/${encodeURIComponent(requestId)}`, resolvePortalAPIOrigin());
+    const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+            Accept: "application/json",
+        },
+        cache: "no-store",
+    });
+
+    if (!response.ok) {
+        throw new Error(`Portal request fetch failed with status ${response.status}.`);
+    }
+
+    return (await response.json()) as WebsiteRequestRecord;
 };
 
 const caseInsensitiveQueryMap = (
@@ -166,19 +285,20 @@ const portalPayloadFromURL = (value: string): PortalStartPayload | null => {
         const payload = {
             requestId:
                 queryValue(queryValues, "rid", "requestid", "request_id") ||
-                `request-${Date.now()}`,
+                undefined,
             fullName: queryValue(queryValues, "n", "fullname", "full_name"),
             topic: queryValue(queryValues, "t", "topic"),
             summary: queryValue(queryValues, "s", "summary"),
             additionalNotes: queryValue(
                 queryValues,
+                "a",
                 "notes",
                 "additionalnotes",
                 "additional_notes",
             ),
         } satisfies PortalStartPayload;
 
-        if (!payload.fullName || !payload.topic || !payload.summary) {
+        if (!payload.requestId && (!payload.fullName || !payload.topic || !payload.summary)) {
             return null;
         }
 
@@ -254,39 +374,6 @@ const storageComponent = (value: string): string => {
     return safe || "attachment";
 };
 
-const renderQRCodeMarkup = (rows: readonly string[]): string => {
-    const size = rows.length;
-    const rects: string[] = [];
-
-    rows.forEach((row, rowIndex) => {
-        let x = 0;
-        const y = size - rowIndex - 1;
-
-        while (x < row.length) {
-            if (row.charCodeAt(x) !== 49) {
-                x += 1;
-                continue;
-            }
-
-            const runStart = x;
-            while (x < row.length && row.charCodeAt(x) === 49) {
-                x += 1;
-            }
-
-            rects.push(
-                `<rect x="${runStart}" y="${y}" width="${x - runStart}" height="1" fill="black"/>`,
-            );
-        }
-    });
-
-    return [
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" role="img" aria-label="Portal start barcode">`,
-        "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>",
-        ...rects,
-        "</svg>",
-    ].join("");
-};
-
 const setupRequestBuilder = (): void => {
     if (typeof document === "undefined") {
         return;
@@ -305,11 +392,14 @@ const setupRequestBuilder = (): void => {
     const statusLine = document.getElementById("request-json-status");
     const output = document.getElementById("request-json-output");
     const barcodeCard = document.getElementById("portal-start-card");
-    const barcodeFrame = document.getElementById("portal-start-barcode");
+    const appBarcodeFrame = document.getElementById("portal-start-app-barcode");
+    const cameraBarcodeFrame = document.getElementById("portal-start-camera-barcode");
     const barcodeCaption = document.getElementById("portal-start-caption");
     const barcodeOpenLink = document.getElementById("portal-start-open-link");
     const barcodeCopyLinkButton = document.getElementById("copy-portal-start-link");
     const barcodeLinkPreview = document.getElementById("portal-start-link-preview");
+    const portalSyncStatus = document.getElementById("portal-sync-status");
+    const portalSyncDetails = document.getElementById("portal-sync-details");
     const landingCard = document.getElementById("portal-start-landing");
     const landingMessage = document.getElementById("portal-start-landing-message");
     const landingOpenLink = document.getElementById("portal-start-landing-open-link");
@@ -329,11 +419,14 @@ const setupRequestBuilder = (): void => {
         !(statusLine instanceof HTMLParagraphElement) ||
         !(output instanceof HTMLPreElement) ||
         !(barcodeCard instanceof HTMLDivElement) ||
-        !(barcodeFrame instanceof HTMLDivElement) ||
+        !(appBarcodeFrame instanceof HTMLDivElement) ||
+        !(cameraBarcodeFrame instanceof HTMLDivElement) ||
         !(barcodeCaption instanceof HTMLParagraphElement) ||
         !(barcodeOpenLink instanceof HTMLAnchorElement) ||
         !(barcodeCopyLinkButton instanceof HTMLButtonElement) ||
-        !(barcodeLinkPreview instanceof HTMLParagraphElement)
+        !(barcodeLinkPreview instanceof HTMLParagraphElement) ||
+        !(portalSyncStatus instanceof HTMLParagraphElement) ||
+        !(portalSyncDetails instanceof HTMLParagraphElement)
     ) {
         return;
     }
@@ -341,15 +434,103 @@ const setupRequestBuilder = (): void => {
     let latestJSON = "";
     let latestPortalStartLandingURL = "";
     let latestPortalStartAppURL = "";
+    let portalSyncPollHandle: number | null = null;
 
     authenticateJasonButton.textContent = "Use demo request";
 
+    const stopPortalSyncPolling = (): void => {
+        if (portalSyncPollHandle !== null) {
+            window.clearInterval(portalSyncPollHandle);
+            portalSyncPollHandle = null;
+        }
+    };
+
+    const setPortalSyncState = (summary: string, details = ""): void => {
+        portalSyncStatus.textContent = summary;
+        portalSyncDetails.textContent = details;
+    };
+
+    const applyPortalSyncRecord = (record: WebsiteRequestRecord): void => {
+        switch (record.status) {
+            case "started": {
+                const startedBits = [
+                    record.hostDisplayName ? `Host: ${record.hostDisplayName}` : "",
+                    record.sessionCode ? `Session code: ${record.sessionCode}` : "",
+                    record.startedAt ? `Started: ${new Date(record.startedAt).toLocaleString()}` : "",
+                ].filter(Boolean);
+
+                setPortalSyncState(
+                    "WelcomTalk session started in the app.",
+                    startedBits.join(" • "),
+                );
+                stopPortalSyncPolling();
+                break;
+            }
+
+            case "imported": {
+                const importedBits = [
+                    record.hostDisplayName ? `Host: ${record.hostDisplayName}` : "",
+                    record.importedAt ? `Imported: ${new Date(record.importedAt).toLocaleString()}` : "",
+                ].filter(Boolean);
+
+                setPortalSyncState(
+                    "WelcomTalk imported this request. Review and start the session in the app.",
+                    importedBits.join(" • "),
+                );
+                break;
+            }
+
+            default:
+                setPortalSyncState(
+                    "Waiting for the WelcomTalk app to import this request.",
+                    "Keep this page open if you want to watch the handoff status update.",
+                );
+                break;
+        }
+    };
+
+    const startPortalSyncPolling = (requestId: string): void => {
+        stopPortalSyncPolling();
+        applyPortalSyncRecord({
+            requestId,
+            createdAt: new Date().toISOString(),
+            source: "welcomtalk-portal",
+            fullName: "",
+            topic: "",
+            summary: "",
+            additionalNotes: "",
+            status: "submitted",
+            attachments: [],
+        });
+
+        const poll = async (): Promise<void> => {
+            try {
+                const latestRecord = await fetchPortalRequest(requestId);
+                applyPortalSyncRecord(latestRecord);
+            } catch {
+                setPortalSyncState(
+                    "Waiting for the WelcomTalk app to import this request.",
+                    "Sync status is temporarily unavailable, but the barcode and link are still ready.",
+                );
+            }
+        };
+
+        void poll();
+        portalSyncPollHandle = window.setInterval(() => {
+            void poll();
+        }, PORTAL_SYNC_POLL_INTERVAL_MS);
+    };
+
     const hideBarcodeCard = (): void => {
+        stopPortalSyncPolling();
         barcodeCard.hidden = true;
-        barcodeFrame.replaceChildren();
+        appBarcodeFrame.replaceChildren();
+        cameraBarcodeFrame.replaceChildren();
         barcodeCaption.textContent = "";
         barcodeOpenLink.href = "#";
         barcodeLinkPreview.textContent = "";
+        portalSyncStatus.textContent = "";
+        portalSyncDetails.textContent = "";
         latestPortalStartLandingURL = "";
         latestPortalStartAppURL = "";
     };
@@ -369,7 +550,9 @@ const setupRequestBuilder = (): void => {
         const customSchemeURL = customSchemeURLForPortalPayload(payload);
         landingCard.hidden = false;
         landingMessage.textContent =
-            `We found a WelcomTalk Portal start link for ${payload.fullName}. If the app does not open automatically, tap below.`;
+            payload.fullName
+                ? `We found a WelcomTalk Portal start link for ${payload.fullName}. If the app does not open automatically, tap below.`
+                : "We found a WelcomTalk Portal start link. If the app does not open automatically, tap below.";
         landingOpenLink.href = customSchemeURL;
 
         landingCopyLinkButton.onclick = async () => {
@@ -387,20 +570,44 @@ const setupRequestBuilder = (): void => {
     ): Promise<void> => {
         const landingURL = landingURLForPortalPayload(payload);
         const customSchemeURL = customSchemeURLForPortalPayload(payload);
+        const qrCodeURL = qrCodeURLForPortalPayload(payload);
+        const label = payload.fullName && payload.topic
+            ? `${payload.fullName} · ${payload.topic}`
+            : payload.requestId
+                ? `Request ${payload.requestId}`
+                : "Portal request";
 
         barcodeCard.hidden = false;
-        barcodeFrame.innerHTML = await QRCode.toString(landingURL, {
-            errorCorrectionLevel: "H",
-            margin: 1,
+        appBarcodeFrame.innerHTML = await QRCode.toString(qrCodeURL, {
+            errorCorrectionLevel: "M",
+            margin: 2,
             type: "svg",
-            width: 320,
+            width: 420,
         });
+
+        cameraBarcodeFrame.innerHTML = await QRCode.toString(landingURL, {
+            errorCorrectionLevel: "M",
+            margin: 2,
+            type: "svg",
+            width: 520,
+        });
+
         barcodeCaption.textContent =
-            `${payload.fullName} · ${payload.topic} · Scan this in WelcomTalk or with your iPhone Camera to open the session.`;
+            `${label} · Use the app QR inside WelcomTalk. Use the camera QR with iPhone Camera or any browser-based scanner.`;
         barcodeOpenLink.href = customSchemeURL;
-        barcodeLinkPreview.textContent = landingURL;
+        barcodeLinkPreview.textContent = `Camera/browser fallback: ${landingURL}`;
         latestPortalStartLandingURL = landingURL;
         latestPortalStartAppURL = customSchemeURL;
+
+        if (payload.requestId) {
+            startPortalSyncPolling(payload.requestId);
+        } else {
+            stopPortalSyncPolling();
+            setPortalSyncState(
+                "Direct barcode fallback is active.",
+                "Remote sync status is unavailable for this inline payload barcode.",
+            );
+        }
     };
 
     const writeRecordPreview = (
@@ -460,11 +667,21 @@ const setupRequestBuilder = (): void => {
             return;
         }
 
-        writeRecordPreview(
-            record,
-            "JSON generated locally in WelcomTalk Portal. Scan the barcode below or open the app link on this device.",
-        );
-        await showBarcodeCard(buildPortalStartPayload(record));
+        try {
+            const storedRecord = await submitPortalRequest(record);
+
+            writeRecordPreview(
+                storedRecord,
+                "Request saved to the WelcomTalk handoff service. Scan the barcode below or open the app link on this device.",
+            );
+            await showBarcodeCard(buildStoredPortalStartPayload(storedRecord));
+        } catch {
+            writeRecordPreview(
+                record,
+                "Remote handoff is unavailable right now, so a direct barcode fallback was generated instead.",
+            );
+            await showBarcodeCard(buildInlinePortalStartPayload(record));
+        }
     });
 
     authenticateJasonButton.addEventListener("click", async () => {
@@ -483,11 +700,21 @@ const setupRequestBuilder = (): void => {
             return;
         }
 
-        writeRecordPreview(
-            record,
-            "Demo request loaded. Scan the barcode in WelcomTalk on your iPhone to start the session.",
-        );
-        await showBarcodeCard(buildPortalStartPayload(record));
+        try {
+            const storedRecord = await submitPortalRequest(record);
+
+            writeRecordPreview(
+                storedRecord,
+                "Demo request loaded and saved remotely. Scan the barcode in WelcomTalk on your iPhone to start the session.",
+            );
+            await showBarcodeCard(buildStoredPortalStartPayload(storedRecord));
+        } catch {
+            writeRecordPreview(
+                record,
+                "Demo request loaded, but remote handoff is unavailable, so a direct barcode fallback was generated.",
+            );
+            await showBarcodeCard(buildInlinePortalStartPayload(record));
+        }
     });
 
     copyButton.addEventListener("click", async () => {

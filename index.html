@@ -359,11 +359,33 @@
         justify-content: center;
         margin-top: 18px;
       }
+      .barcode-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .barcode-panel {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 16px;
+      }
+      .barcode-panel h4 {
+        color: #fff;
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+      }
+      .barcode-panel p {
+        color: #8fa0c0;
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
       .barcode-frame svg {
-        width: min(280px, 100%);
+        width: min(360px, 100%);
         height: auto;
         background: #fff;
-        padding: 14px;
+        padding: 10px;
         border-radius: 18px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
       }
@@ -638,12 +660,38 @@ JSON preview appears here after generation.</pre
           <div class="barcode-card" id="portal-start-card" hidden>
             <div class="barcode-title">Scan on your iPhone</div>
             <p class="barcode-helper">
-              Open WelcomTalk on your iPhone and tap
-              <strong>Scan Portal Barcode</strong>, or scan this with your
-              iPhone Camera to jump into the app.
+              If you scan with a generic scanner, seeing a raw
+              <strong>welcomtalk://</strong> link is normal — that is the app
+              handoff URL. To avoid confusion, the page now shows one QR for the
+              app and one for the Camera/browser fallback.
             </p>
-            <div class="barcode-frame" id="portal-start-barcode"></div>
+            <div class="barcode-grid">
+              <div class="barcode-panel">
+                <h4>Use inside WelcomTalk</h4>
+                <p>
+                  Open WelcomTalk and tap <strong>Scan Portal Barcode</strong>.
+                  This QR is shorter and optimized for the in-app scanner.
+                </p>
+                <div class="barcode-frame" id="portal-start-app-barcode"></div>
+              </div>
+
+              <div class="barcode-panel">
+                <h4>Use with iPhone Camera</h4>
+                <p>
+                  Scan this with the iPhone Camera or a browser-based scanner to
+                  open the fallback web handoff page.
+                </p>
+                <div
+                  class="barcode-frame"
+                  id="portal-start-camera-barcode"
+                ></div>
+              </div>
+            </div>
             <p class="barcode-caption" id="portal-start-caption"></p>
+            <p class="status-line" id="portal-sync-status">
+              Waiting for the WelcomTalk app to import this request.
+            </p>
+            <p class="status-line" id="portal-sync-details"></p>
             <div class="button-row">
               <a
                 class="hero-link hero-link-primary"
