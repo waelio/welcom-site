@@ -32,6 +32,8 @@ That launches a local Vite server on `http://127.0.0.1:4173/index.html` and open
 
 If you want to experiment with the SwiftWasm/Tokamak path directly, the older `carton` flow is still in the repo, but it is currently less reliable than `pnpm dev` on this machine.
 
+The optional WebAssembly build now reads its preferred SwiftWasm version from `scripts/swiftwasm-version.txt`. The build script writes a temporary root `.swift-version` only while `carton` is running so static hosts do not try to install SwiftWasm during deploy setup.
+
 The browser beta currently talks to `wss://waelio-messaging.onrender.com` by default. You can override that in the page shell by setting `window.__WELCOM_WS_URL__` before `app.js` loads.
 
 ## Production build
@@ -43,6 +45,8 @@ Build the WebAssembly bundle and sync generated assets into the repository root:
 ```
 
 That script copies the generated `app.js`, `index.js`, `intrinsics.js`, `.wasm`, and any runtime resource folders into the repository root so GitHub Pages or another static host can serve them directly.
+
+For Netlify, this repository is configured as a static deploy: publish the repository root and skip any server-side Swift build. The committed root files are the deploy artifact.
 
 ## Shared package note
 

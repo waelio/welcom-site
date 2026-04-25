@@ -1,0 +1,3 @@
+[build]
+  command = "printf 'Static deploy: using committed site files from repository root.\n'"
+  publish = "."

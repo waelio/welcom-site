@@ -3,3 +3,4 @@
 .swiftpm/
 Bundle/
 node_modules/
+.swift-version
