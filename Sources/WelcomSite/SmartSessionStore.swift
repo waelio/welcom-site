@@ -85,6 +85,24 @@ final class SmartSessionStore: ObservableObject {
         "Web beta uses a lightweight relay to sync browsers in real time. Today it mirrors the equal-turn two-participant session model, while the iPhone app remains the most private path with local Multipeer sessions."
     }
 
+    func fillDemoHostDraft() {
+        hostTopic = "Demo equal-turn session"
+        hostName = "Speaker A"
+        selectedRounds = 2
+        selectedTurnDuration = 30
+        errorMessage = nil
+    }
+
+    func fillDemoGuestDraft() {
+        guestName = "Speaker B"
+
+        if normalizedJoinCode.isEmpty {
+            joinCode = BrowserSupport.currentJoinCode() ?? ""
+        }
+
+        errorMessage = nil
+    }
+
     func createSession() {
         resetTransientState(keepDrafts: true)
 

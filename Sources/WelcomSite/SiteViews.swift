@@ -601,6 +601,12 @@ struct SmartSessionWorkbenchView: View {
                             StyledTextInput(title: "Conversation topic", text: $sessionStore.hostTopic)
                             StyledTextInput(title: "Your name", text: $sessionStore.hostName)
 
+                            SessionCalloutBox(
+                                heading: "Quick demo",
+                                detail: "Just testing the flow? Use neutral placeholders instead of real names. One easy setup is Speaker A for the host and Speaker B for the guest.",
+                                accentColor: SitePalette.accentMuted
+                            )
+
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Equal rounds per participant")
                                     .font(.system(size: 13, weight: .semibold))
@@ -636,6 +642,13 @@ struct SmartSessionWorkbenchView: View {
                             }
 
                             WideActionButton(
+                                title: "Use demo host values",
+                                style: .outline,
+                                isDisabled: false,
+                                action: sessionStore.fillDemoHostDraft
+                            )
+
+                            WideActionButton(
                                 title: "Start live session",
                                 style: .filled,
                                 isDisabled: !sessionStore.canCreateSession,
@@ -648,6 +661,19 @@ struct SmartSessionWorkbenchView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             StyledTextInput(title: "Your name", text: $sessionStore.guestName)
                             StyledTextInput(title: "Session code", text: $sessionStore.joinCode)
+
+                            SessionCalloutBox(
+                                heading: "Quick demo",
+                                detail: "For a simple test run, keep the second browser anonymous too and join as Speaker B.",
+                                accentColor: SitePalette.accentMuted
+                            )
+
+                            WideActionButton(
+                                title: "Use demo guest values",
+                                style: .outline,
+                                isDisabled: false,
+                                action: sessionStore.fillDemoGuestDraft
+                            )
 
                             WideActionButton(
                                 title: "Join session",
