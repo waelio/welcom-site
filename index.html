@@ -455,6 +455,33 @@
       </header>
 
       <main>
+        <div
+          class="request-builder section-block"
+          id="portal-start-landing"
+          hidden
+        >
+          <div class="section-title">Open in WelcomTalk</div>
+          <p class="helper" id="portal-start-landing-message">
+            We found a WelcomTalk Portal start link. If the app does not open
+            automatically, use the button below.
+          </p>
+          <div class="button-row">
+            <a
+              class="hero-link hero-link-primary"
+              id="portal-start-landing-open-link"
+              href="#"
+              >Open WelcomTalk</a
+            >
+            <button
+              class="action-button secondary"
+              id="portal-start-landing-copy-link"
+              type="button"
+            >
+              Copy app link
+            </button>
+          </div>
+        </div>
+
         <div class="about section-block">
           <div class="section-title">Introducing the concept</div>
           <p>
@@ -515,9 +542,9 @@
           <div class="section-title">Create request JSON</div>
           <p class="helper">
             This is the WelcomTalk Portal flow where the user fills in the
-            request details and generates the JSON case record. The live
-            conversation flow can come later; WelcomTalk Portal should prepare
-            the structured request first.
+            request details, generates the JSON case record, and creates a
+            barcode that opens the iPhone app with the same conversation
+            context.
           </p>
 
           <div class="request-grid">
@@ -596,7 +623,7 @@
               id="authenticate-jason"
               type="button"
             >
-              Verifyveriftherethey Jason
+              Use demo request
             </button>
           </div>
 
@@ -611,12 +638,28 @@ JSON preview appears here after generation.</pre
           <div class="barcode-card" id="portal-start-card" hidden>
             <div class="barcode-title">Scan on your iPhone</div>
             <p class="barcode-helper">
-              Open WelcomTalk on your iPhone, tap
-              <strong>Scan Portal Barcode</strong>, and scan this code to start
-              the session.
+              Open WelcomTalk on your iPhone and tap
+              <strong>Scan Portal Barcode</strong>, or scan this with your
+              iPhone Camera to jump into the app.
             </p>
             <div class="barcode-frame" id="portal-start-barcode"></div>
             <p class="barcode-caption" id="portal-start-caption"></p>
+            <div class="button-row">
+              <a
+                class="hero-link hero-link-primary"
+                id="portal-start-open-link"
+                href="#"
+                >Open WelcomTalk on this device</a
+              >
+              <button
+                class="action-button secondary"
+                id="copy-portal-start-link"
+                type="button"
+              >
+                Copy iPhone link
+              </button>
+            </div>
+            <p class="status-line" id="portal-start-link-preview"></p>
           </div>
         </div>
 

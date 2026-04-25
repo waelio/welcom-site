@@ -3,12 +3,13 @@
     "private": true,
     "packageManager": "pnpm@8.14.1",
     "scripts": {
-        "build:static-shell": "tsc -p tsconfig.static.json && cp .generated-static/app.js app.js",
+        "build:static-shell": "tsc -p tsconfig.static.json --noEmit && vite build --config vite.static.config.ts && cp .generated-static/app.js app.js",
         "dev": "pnpm build:static-shell && vite",
         "start": "pnpm dev",
         "preview": "pnpm build:static-shell && vite preview"
     },
     "devDependencies": {
+        "@types/qrcode": "^1.5.6",
         "typescript": "^5.8.3",
         "vite": "^5.4.19"
     },
