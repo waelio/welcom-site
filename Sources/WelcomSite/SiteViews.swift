@@ -121,12 +121,12 @@ struct HomePageView: View {
 
             SessionCalloutBox(
                 heading: "Fair by design",
-                detail: "WelcomTalk starts with a structured request record on the website, then stays neutral in live sessions: one person speaks at a time, everyone gets equal timed turns by default, and every participant has space to present their side.",
+                detail: "The Portal starts with a structured request, then stays neutral in live sessions: one person speaks at a time, everyone gets equal timed turns by default, and every participant has space to present their side.",
                 accentColor: SitePalette.accent
             )
 
             VStack(alignment: .leading, spacing: 16) {
-                SectionHeading(title: "Live web session beta")
+                SectionHeading(title: "Live portal session beta")
 
                 SmartSessionWorkbenchView(sessionStore: sessionStore)
             }
@@ -180,8 +180,8 @@ struct RequestJSONBuilderView: View {
 
     var body: some View {
         SmartCardShell(
-            title: "Website request form",
-            subtitle: "This is the website flow where a user fills in the request and creates the JSON case record."
+            title: "Portal request form",
+            subtitle: "This is the portal flow where a user fills in the request and creates the JSON case record."
         ) {
             VStack(alignment: .leading, spacing: 14) {
                 StyledTextInput(title: "Full name", text: $requestStore.fullName)
@@ -194,7 +194,7 @@ struct RequestJSONBuilderView: View {
 
                 SessionCalloutBox(
                     heading: "Form note",
-                    detail: "The website preview currently lists supporting documents by name inside the generated JSON. Real upload and storage wiring can be connected later without changing the request structure.",
+                    detail: "The portal preview currently lists supporting documents by name inside the generated JSON. Real upload and storage wiring can be connected later without changing the request structure.",
                     accentColor: SitePalette.accentMuted
                 )
 
@@ -256,7 +256,7 @@ struct LegalPageView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            OutlineActionButton(title: "← Back to WelcomTalk") {
+            OutlineActionButton(title: "← Back to Portal") {
                 BrowserSupport.navigate(to: .home)
             }
 
@@ -354,7 +354,7 @@ struct FooterView: View {
                 .overlay(SitePalette.border)
 
             VStack(alignment: .leading, spacing: 12) {
-                Text("© 2026 Wael Wahbeh. Shared web experience powered by SwiftWasm + Tokamak.")
+                Text("© 2026 Wael Wahbeh. Shared portal experience powered by SwiftWasm + Tokamak.")
                     .font(.system(size: 14, weight: .regular))
                     .foregroundColor(SitePalette.textSecondary)
 
@@ -469,8 +469,8 @@ struct SmartSessionWorkbenchView: View {
                 .foregroundColor(SitePalette.textSecondary)
 
             SessionCalloutBox(
-                heading: "Current web scope",
-                detail: "Today's live browser beta supports one host and one guest with equal timed turns. The wider product idea stays flexible so the format can grow over time.",
+                heading: "Current portal scope",
+                detail: "Today's live portal beta supports one host and one guest with equal timed turns. The wider product idea stays flexible so the format can grow over time.",
                 accentColor: SitePalette.accentMuted
             )
 
@@ -712,7 +712,7 @@ struct RequestConsentRow: View {
                     .foregroundColor(isSelected ? SitePalette.accent : SitePalette.textSecondary)
                     .font(.system(size: 18, weight: .semibold))
 
-                Text("I agree to submit this information for review and generate the JSON record on the website.")
+                Text("I agree to submit this information for review and generate the JSON record in the portal.")
                     .font(.system(size: 14, weight: .regular))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -944,7 +944,7 @@ final class RequestJSONStore: ObservableObject {
     @Published var additionalNotes: String = ""
     @Published var hasConsent: Bool = false
     @Published private(set) var generatedJSON: String = ""
-    @Published private(set) var statusMessage: String? = "Fill in the request details and consent to generate the JSON record."
+    @Published private(set) var statusMessage: String? = "Fill in the request details and consent to generate the JSON record in the portal."
     @Published private(set) var didCopyJSON = false
 
     var canGenerate: Bool {
@@ -979,7 +979,7 @@ final class RequestJSONStore: ObservableObject {
         }
 
         generatedJSON = json
-        statusMessage = "JSON generated locally in the website."
+        statusMessage = "JSON generated locally in the portal."
         didCopyJSON = false
     }
 

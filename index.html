@@ -3,7 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WelcomTalk – Website Request JSON Builder</title>
+    <title>Portal – Request JSON Builder</title>
+    <link rel="icon" type="image/png" href="./icons/portal-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      media="(prefers-color-scheme: dark)"
+      href="./icons/portal-icon-dark.png"
+    />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Portal" />
+    <meta name="application-name" content="Portal" />
+    <meta name="theme-color" content="#0d1f3c" />
     <style>
       *,
       *::before,
@@ -230,18 +241,18 @@
   <body>
     <div data-static-page>
       <header>
-        <h1>Welcom<span>Talk</span></h1>
-        <p>Create request JSON on the web</p>
-        <span class="badge">Website JSON Builder</span>
+        <h1>Portal</h1>
+        <p>Create request JSON in the portal</p>
+        <span class="badge">Portal JSON Builder</span>
       </header>
 
       <main>
         <div class="request-builder">
           <div class="section-title">Create request JSON</div>
           <p class="helper">
-            This website is where the user fills in the request details and
+            This portal is where the user fills in the request details and
             generates the JSON case record. The live conversation flow can come
-            later; the website should prepare the structured request first.
+            later; the portal should prepare the structured request first.
           </p>
 
           <div class="request-grid">
@@ -289,7 +300,7 @@
             <input id="request-consent" type="checkbox" />
             <span
               >I agree to submit this information for review and generate the
-              JSON record on the website.</span
+              JSON record in the portal.</span
             >
           </label>
 
@@ -329,10 +340,10 @@ JSON preview appears here after generation.</pre
         <div class="about" style="margin-bottom: 32px">
           <div class="section-title">Fair by design</div>
           <p>
-            WelcomTalk starts by creating a structured request record on the
-            website, then stays neutral in live conversations: one person speaks
-            at a time, everyone gets an equal timed turn, and every participant
-            has a fair chance to present their side.
+            The Portal starts with a structured request record, then stays
+            neutral in live conversations: one person speaks at a time, everyone
+            gets an equal timed turn, and every participant has a fair chance to
+            present their side.
           </p>
           <p>
             The current live web beta mirrors the two-person session engine used
@@ -347,7 +358,7 @@ JSON preview appears here after generation.</pre
             <div class="icon">🧾</div>
             <h3>Request JSON Builder</h3>
             <p>
-              Fill in the request on the website and generate a structured JSON
+              Fill in the request in the portal and generate a structured JSON
               record that can later feed the app or a backend workflow.
             </p>
           </div>
@@ -363,7 +374,7 @@ JSON preview appears here after generation.</pre
             <div class="icon">🧭</div>
             <h3>Neutral Structure</h3>
             <p>
-              WelcomTalk does not decide who is right. It gives people a clear
+              The Portal does not decide who is right. It gives people a clear
               structure to present their side and respond.
             </p>
           </div>
@@ -388,7 +399,7 @@ JSON preview appears here after generation.</pre
             <div class="icon">🔒</div>
             <h3>Private by Design</h3>
             <p>
-              The website can prepare the structured JSON record, while the
+              The portal can prepare the structured JSON record, while the
               iPhone app remains the most private path for sensitive live
               conversations.
             </p>
@@ -398,8 +409,7 @@ JSON preview appears here after generation.</pre
         <div class="about">
           <div class="section-title">About</div>
           <p>
-            WelcomTalk (displayed as <strong>Safe Talk</strong> on your device)
-            starts on the website: the user fills in request details, adds
+            The Portal starts here: the user fills in request details, adds
             supporting documents, and generates a structured JSON case record.
           </p>
           <p>
@@ -410,7 +420,7 @@ JSON preview appears here after generation.</pre
           <p>
             The iPhone experience remains the most private path for live
             sessions: devices communicate directly with Multipeer Connectivity
-            and no relay is involved. The website is the clearest place to
+            and no relay is involved. The portal is the clearest place to
             prepare the JSON request record before that conversation starts.
           </p>
         </div>
@@ -510,7 +520,7 @@ JSON preview appears here after generation.</pre
           return {
             requestId,
             createdAt: new Date().toISOString(),
-            source: "website",
+            source: "portal",
             fullName: trimmedName,
             topic: trimmedTopic,
             summary: trimmedSummary,
@@ -534,7 +544,7 @@ JSON preview appears here after generation.</pre
 
           latestJSON = JSON.stringify(record, null, 2);
           output.textContent = latestJSON;
-          statusLine.textContent = "JSON generated locally in the website.";
+          statusLine.textContent = "JSON generated locally in the portal.";
         });
 
         copyButton.addEventListener("click", async () => {
@@ -563,10 +573,10 @@ JSON preview appears here after generation.</pre
           const url = URL.createObjectURL(blob);
           const anchor = document.createElement("a");
           anchor.href = url;
-          anchor.download = "welcomtalk-request.json";
+          anchor.download = "portal-request.json";
           anchor.click();
           URL.revokeObjectURL(url);
-          statusLine.textContent = "JSON downloaded from the website.";
+          statusLine.textContent = "JSON downloaded from the portal.";
         });
       })();
     </script>

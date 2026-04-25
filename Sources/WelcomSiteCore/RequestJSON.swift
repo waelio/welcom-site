@@ -104,7 +104,7 @@ public struct RequestFormDraft: Hashable {
         return WebsiteRequestRecord(
             requestId: requestId,
             createdAt: formatter.string(from: createdAt),
-            source: "website",
+            source: "portal",
             fullName: trimmed(fullName),
             topic: trimmed(topic),
             summary: trimmed(summary),

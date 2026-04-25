@@ -6,7 +6,7 @@ import Testing
     let viewModel = WebsiteViewModel(route: .home)
 
     #expect(viewModel.homePage.features.count == 6)
-    #expect(viewModel.homePage.badge == "Website JSON Builder")
+    #expect(viewModel.homePage.badge == "Portal JSON Builder")
     #expect(viewModel.homePage.features.first?.title == "Request JSON Builder")
     #expect(viewModel.homePage.sharedSessionSummary.fairnessLine.contains("Equal time for each participant"))
 }
@@ -43,7 +43,7 @@ import Testing
     )
 
     #expect(record?.requestId == "REQ-123")
-    #expect(record?.source == "website")
+    #expect(record?.source == "portal")
     #expect(record?.attachments.count == 2)
     #expect(record?.attachments.first?.contentType == "application/pdf")
     #expect(draft.generatedJSONPreview(requestId: "REQ-123", createdAt: Date(timeIntervalSince1970: 0)) != nil)
