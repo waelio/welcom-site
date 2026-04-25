@@ -164,7 +164,7 @@ struct HomePageView: View {
             )
 
             VStack(alignment: .leading, spacing: 16) {
-                SectionHeading(title: "Live portal session beta")
+                SectionHeading(title: "Live WelcomTalk Portal beta")
 
                 SmartSessionWorkbenchView(sessionStore: sessionStore)
             }
@@ -237,8 +237,8 @@ struct RequestJSONBuilderView: View {
 
     var body: some View {
         SmartCardShell(
-            title: "Portal request form",
-            subtitle: "This is the Portal flow inside WelcomTalk where a user fills in the request and creates the JSON case record."
+            title: "WelcomTalk Portal request form",
+            subtitle: "This is the WelcomTalk Portal flow where a user fills in the request and creates the JSON case record."
         ) {
             VStack(alignment: .leading, spacing: 14) {
                 StyledTextInput(title: "Full name", text: $requestStore.fullName)
@@ -251,7 +251,7 @@ struct RequestJSONBuilderView: View {
 
                 SessionCalloutBox(
                     heading: "Form note",
-                    detail: "The Portal preview currently lists supporting documents by name inside the generated JSON. Real upload and storage wiring can be connected later without changing the request structure.",
+                    detail: "The WelcomTalk Portal preview currently lists supporting documents by name inside the generated JSON. Real upload and storage wiring can be connected later without changing the request structure.",
                     accentColor: SitePalette.accentMuted
                 )
 
@@ -581,7 +581,7 @@ struct SmartSessionWorkbenchView: View {
                 .foregroundColor(SitePalette.textSecondary)
 
             SessionCalloutBox(
-                heading: "Current portal scope",
+                heading: "Current WelcomTalk Portal scope",
                 detail: "Today's WelcomTalk Portal beta supports one host and one guest with equal timed turns. The wider product idea stays flexible so the format can grow over time.",
                 accentColor: SitePalette.accentMuted
             )

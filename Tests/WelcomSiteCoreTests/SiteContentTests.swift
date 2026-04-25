@@ -6,7 +6,11 @@ import Testing
     let viewModel = WebsiteViewModel(route: .home)
 
     #expect(viewModel.homePage.features.count == 6)
-    #expect(viewModel.homePage.badge == "Portal JSON Builder")
+    #expect(viewModel.homePage.appName == "WelcomTalk")
+    #expect(viewModel.homePage.appCaption == "Portal")
+    #expect(viewModel.homePage.badge == "Introducing a new category")
+    #expect(viewModel.homePage.processSteps.count == 4)
+    #expect(viewModel.homePage.contactEmail == "wahbehw@me.com")
     #expect(viewModel.homePage.features.first?.title == "Request JSON Builder")
     #expect(viewModel.homePage.sharedSessionSummary.fairnessLine.contains("Equal time for each participant"))
 }
@@ -16,6 +20,7 @@ import Testing
 
     #expect(viewModel.legalPage?.title == "Privacy Policy")
     #expect(viewModel.legalPage?.sections.count == 11)
+    #expect(viewModel.legalPage?.highlight?.contains("WelcomTalk Portal") == true)
 }
 
 @Test func sharedSessionSummaryComesFromParentModelPackage() {
@@ -43,7 +48,7 @@ import Testing
     )
 
     #expect(record?.requestId == "REQ-123")
-    #expect(record?.source == "portal")
+    #expect(record?.source == "welcomtalk-portal")
     #expect(record?.attachments.count == 2)
     #expect(record?.attachments.first?.contentType == "application/pdf")
     #expect(draft.generatedJSONPreview(requestId: "REQ-123", createdAt: Date(timeIntervalSince1970: 0)) != nil)

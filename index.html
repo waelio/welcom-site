@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portal – Request JSON Builder</title>
+    <title>WelcomTalk Portal – Request JSON Builder</title>
     <link rel="icon" type="image/png" href="./icons/portal-icon.png" />
     <link
       rel="icon"
@@ -12,8 +12,8 @@
       href="./icons/portal-icon-dark.png"
     />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="Portal" />
-    <meta name="application-name" content="Portal" />
+    <meta name="apple-mobile-web-app-title" content="WelcomTalk" />
+    <meta name="application-name" content="WelcomTalk" />
     <meta name="theme-color" content="#0d1f3c" />
     <style>
       *,
@@ -47,37 +47,76 @@
         color: #fff;
         letter-spacing: -0.5px;
       }
-      header h1 span {
-        color: #c9a84c;
-      }
-      header p {
-        margin-top: 12px;
-        font-size: 1.15rem;
-        color: #a8b8d8;
-      }
-      .badge {
+      .eyebrow {
         display: inline-block;
-        margin-top: 28px;
         background: #c9a84c;
         color: #0d1f3c;
         font-size: 0.85rem;
         font-weight: 700;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         padding: 6px 16px;
         border-radius: 20px;
       }
+      header .caption {
+        margin-top: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #d8c890;
+      }
+      header .lead {
+        margin-top: 18px;
+        font-size: clamp(1.3rem, 3vw, 2rem);
+        color: #fff;
+        font-weight: 600;
+      }
+      header .summary {
+        margin: 14px auto 0;
+        max-width: 760px;
+        font-size: 1.05rem;
+        color: #a8b8d8;
+        line-height: 1.8;
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 28px;
+      }
+      .hero-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 18px;
+        border-radius: 14px;
+        color: #fff;
+        text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.07);
+        font-weight: 700;
+      }
+      .hero-link.hero-link-primary {
+        background: #c9a84c;
+        color: #0d1f3c;
+        border-color: #c9a84c;
+      }
       main {
         flex: 1;
-        max-width: 820px;
+        max-width: 960px;
         margin: 0 auto;
         padding: 56px 24px;
+      }
+      .section-block {
+        margin-bottom: 56px;
       }
       .features {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 24px;
-        margin-bottom: 56px;
+        margin-bottom: 0;
       }
       .feature {
         background: rgba(255, 255, 255, 0.05);
@@ -110,18 +149,96 @@
         background: rgba(255, 255, 255, 0.04);
         border-radius: 16px;
         padding: 32px;
-        margin-bottom: 56px;
+        margin-bottom: 0;
         line-height: 1.8;
         color: #a8b8d8;
       }
       .about p + p {
         margin-top: 12px;
       }
+      .process-showcase {
+        position: relative;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 32px;
+      }
+      .process-showcase::before {
+        content: "";
+        position: absolute;
+        left: 32px;
+        right: 32px;
+        top: 88px;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(201, 168, 76, 0.85),
+          transparent
+        );
+        background-size: 200% 100%;
+        animation: flow 5s linear infinite;
+        opacity: 0.8;
+      }
+      .process-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+      }
+      .process-step {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 22px;
+        animation: floatStep 6s ease-in-out infinite;
+      }
+      .process-step:nth-child(2) {
+        animation-delay: 0.7s;
+      }
+      .process-step:nth-child(3) {
+        animation-delay: 1.4s;
+      }
+      .process-step:nth-child(4) {
+        animation-delay: 2.1s;
+      }
+      .process-step::before {
+        content: "";
+        display: block;
+        width: 12px;
+        height: 12px;
+        margin-bottom: 16px;
+        border-radius: 999px;
+        background: #c9a84c;
+        box-shadow: 0 0 0 rgba(201, 168, 76, 0.45);
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+      .step-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #d8c890;
+        margin-bottom: 10px;
+      }
+      .process-step h3 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 10px;
+      }
+      .process-step p {
+        font-size: 0.92rem;
+        color: #8fa0c0;
+        line-height: 1.7;
+      }
       .request-builder {
         background: rgba(255, 255, 255, 0.04);
         border-radius: 16px;
         padding: 32px;
-        margin-bottom: 56px;
+        margin-bottom: 0;
         border: 1px solid rgba(255, 255, 255, 0.08);
       }
       .request-builder p.helper {
@@ -217,6 +334,20 @@
           "Liberation Mono", "Courier New", monospace;
         white-space: pre-wrap;
       }
+      .contact-card {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 16px;
+        padding: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .contact-card a {
+        color: #c9a84c;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .contact-card a:hover {
+        text-decoration: underline;
+      }
       footer {
         text-align: center;
         padding: 32px 24px;
@@ -232,6 +363,32 @@
       footer a:hover {
         text-decoration: underline;
       }
+      @keyframes floatStep {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.18);
+        }
+        50% {
+          box-shadow: 0 0 0 10px rgba(201, 168, 76, 0);
+        }
+      }
+      @keyframes flow {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 200% 50%;
+        }
+      }
     </style>
     <script>
       window.__WELCOM_PAGE__ = "home";
@@ -241,18 +398,89 @@
   <body>
     <div data-static-page>
       <header>
-        <h1>Portal</h1>
-        <p>Create request JSON in the portal</p>
-        <span class="badge">Portal JSON Builder</span>
+        <span class="eyebrow">Introducing a new category</span>
+        <h1>WelcomTalk</h1>
+        <p class="caption">Portal</p>
+        <p class="lead">
+          A fairness-first way to prepare difficult conversations.
+        </p>
+        <p class="summary">
+          WelcomTalk Portal introduces a new market concept: start with a
+          structured request, then move into equal-turn live dialogue only when
+          both sides are ready.
+        </p>
+        <div class="hero-actions">
+          <a class="hero-link hero-link-primary" href="#request-builder"
+            >Try the request builder</a
+          >
+          <a class="hero-link" href="#contact">Contact</a>
+        </div>
       </header>
 
       <main>
-        <div class="request-builder">
+        <div class="about section-block">
+          <div class="section-title">Introducing the concept</div>
+          <p>
+            WelcomTalk is the main product name, and WelcomTalk Portal is the
+            public front door for it — a place to slow the moment down, capture
+            the issue clearly, and create a fairer starting point before a live
+            conversation begins.
+          </p>
+          <p>
+            That matters because this is a new concept entering the market:
+            structure first, then dialogue. Instead of sending people straight
+            into a tense exchange, WelcomTalk Portal helps them arrive with
+            context, clarity, and equal time in mind.
+          </p>
+        </div>
+
+        <section class="process-showcase section-block">
+          <div class="section-title">How it works</div>
+          <div class="process-grid">
+            <div class="process-step">
+              <div class="step-label">Step 01</div>
+              <h3>Capture the request</h3>
+              <p>
+                The user explains the issue, the people involved, and the
+                desired outcome in one structured place.
+              </p>
+            </div>
+            <div class="process-step">
+              <div class="step-label">Step 02</div>
+              <h3>Generate the case record</h3>
+              <p>
+                WelcomTalk Portal turns the intake into a clean JSON record that
+                can support product workflows, human review, or app handoff
+                later.
+              </p>
+            </div>
+            <div class="process-step">
+              <div class="step-label">Step 03</div>
+              <h3>Invite the other side</h3>
+              <p>
+                Once the request is clear, the conversation can move forward
+                with context already established instead of starting in
+                confusion.
+              </p>
+            </div>
+            <div class="process-step">
+              <div class="step-label">Step 04</div>
+              <h3>Run an equal-turn session</h3>
+              <p>
+                When a live discussion happens, everyone gets clear speaking
+                order, equal time, and a neutral framework for follow-up.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div class="request-builder section-block" id="request-builder">
           <div class="section-title">Create request JSON</div>
           <p class="helper">
-            This portal is where the user fills in the request details and
-            generates the JSON case record. The live conversation flow can come
-            later; the portal should prepare the structured request first.
+            This is the WelcomTalk Portal flow where the user fills in the
+            request details and generates the JSON case record. The live
+            conversation flow can come later; WelcomTalk Portal should prepare
+            the structured request first.
           </p>
 
           <div class="request-grid">
@@ -300,7 +528,7 @@
             <input id="request-consent" type="checkbox" />
             <span
               >I agree to submit this information for review and generate the
-              JSON record in the portal.</span
+              JSON record in WelcomTalk Portal.</span
             >
           </label>
 
@@ -337,13 +565,13 @@ JSON preview appears here after generation.</pre
           >
         </div>
 
-        <div class="about" style="margin-bottom: 32px">
+        <div class="about section-block">
           <div class="section-title">Fair by design</div>
           <p>
-            The Portal starts with a structured request record, then stays
-            neutral in live conversations: one person speaks at a time, everyone
-            gets an equal timed turn, and every participant has a fair chance to
-            present their side.
+            WelcomTalk Portal starts with a structured request record, then
+            stays neutral in live conversations: one person speaks at a time,
+            everyone gets an equal timed turn, and every participant has a fair
+            chance to present their side.
           </p>
           <p>
             The current live web beta mirrors the two-person session engine used
@@ -353,75 +581,134 @@ JSON preview appears here after generation.</pre
           </p>
         </div>
 
-        <div class="features">
-          <div class="feature">
-            <div class="icon">🧾</div>
-            <h3>Request JSON Builder</h3>
-            <p>
-              Fill in the request in the portal and generate a structured JSON
-              record that can later feed the app or a backend workflow.
-            </p>
+        <section class="section-block">
+          <div class="section-title">Who it's for</div>
+          <div class="features">
+            <div class="feature">
+              <div class="icon">👤</div>
+              <h3>Individuals</h3>
+              <p>
+                Use WelcomTalk Portal to turn a stressful situation into a
+                structured request before a live conversation begins.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">🤝</div>
+              <h3>Couples &amp; Families</h3>
+              <p>
+                Create a calmer starting point for emotionally charged
+                conversations by organizing context before anyone starts talking
+                over each other.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">🏢</div>
+              <h3>Teams &amp; Organizations</h3>
+              <p>
+                Apply a fairness-first process to internal disputes, feedback
+                loops, or moderated conversations that need more structure.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">🎥</div>
+              <h3>Moderators &amp; Studios</h3>
+              <p>
+                Grow the concept into richer facilitated discussions, studio
+                formats, or creator-led conversations over time.
+              </p>
+            </div>
           </div>
-          <div class="feature">
-            <div class="icon">⚖️</div>
-            <h3>Equal Time</h3>
-            <p>
-              When a live session happens, each participant gets the same timed
-              speaking window by default.
-            </p>
+        </section>
+
+        <section class="section-block">
+          <div class="section-title">Why it works</div>
+          <div class="features">
+            <div class="feature">
+              <div class="icon">🧾</div>
+              <h3>Request JSON Builder</h3>
+              <p>
+                Fill in the request in WelcomTalk Portal and generate a
+                structured JSON record that can later feed the app or a backend
+                workflow.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">⚖️</div>
+              <h3>Equal Time</h3>
+              <p>
+                When a live session happens, each participant gets the same
+                timed speaking window by default.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">🧭</div>
+              <h3>Neutral Structure</h3>
+              <p>
+                WelcomTalk Portal does not decide who is right. It gives people
+                a clear structure to present their side and respond.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">🌐</div>
+              <h3>Live Browser Beta</h3>
+              <p>
+                After the request record is created, today’s web beta can host
+                one equal-turn session with a host and one guest.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">🎬</div>
+              <h3>Individuals to Studios</h3>
+              <p>
+                The concept starts with individual request intake today and can
+                grow into richer moderated discussions and studio-style formats
+                later.
+              </p>
+            </div>
+            <div class="feature">
+              <div class="icon">🔒</div>
+              <h3>Private by Design</h3>
+              <p>
+                WelcomTalk Portal can prepare the structured JSON record, while
+                the iPhone app remains the most private path for sensitive live
+                conversations.
+              </p>
+            </div>
           </div>
-          <div class="feature">
-            <div class="icon">🧭</div>
-            <h3>Neutral Structure</h3>
-            <p>
-              The Portal does not decide who is right. It gives people a clear
-              structure to present their side and respond.
-            </p>
-          </div>
-          <div class="feature">
-            <div class="icon">🌐</div>
-            <h3>Live Browser Beta</h3>
-            <p>
-              After the request record is created, today’s web beta can host one
-              equal-turn session with a host and one guest.
-            </p>
-          </div>
-          <div class="feature">
-            <div class="icon">🎬</div>
-            <h3>Individuals to Studios</h3>
-            <p>
-              The concept starts with individual request intake today and can
-              grow into richer moderated discussions and studio-style formats
-              later.
-            </p>
-          </div>
-          <div class="feature">
-            <div class="icon">🔒</div>
-            <h3>Private by Design</h3>
-            <p>
-              The portal can prepare the structured JSON record, while the
-              iPhone app remains the most private path for sensitive live
-              conversations.
-            </p>
-          </div>
+        </section>
+
+        <div class="about section-block">
+          <div class="section-title">About Us</div>
+          <p>
+            WelcomTalk is being built by Wael Wahbeh as a fairness-first product
+            for introducing, preparing, and eventually hosting difficult
+            conversations.
+          </p>
+          <p>
+            The goal is simple: reduce chaos at the beginning of a tense
+            interaction by giving people a neutral structure before the live
+            moment starts.
+          </p>
+          <p>
+            The iPhone app remains the most private path for live sessions,
+            while WelcomTalk Portal serves as the public front door for
+            explaining the concept, collecting the structured request, and
+            inviting early adopters into the experience.
+          </p>
         </div>
 
-        <div class="about">
-          <div class="section-title">About</div>
+        <div class="contact-card" id="contact">
+          <div class="section-title">Contact</div>
           <p>
-            The Portal starts here: the user fills in request details, adds
-            supporting documents, and generates a structured JSON case record.
+            If you want to talk about partnerships, pilot programs, feedback, or
+            early access, reach out.
           </p>
           <p>
-            After the request is created, the platform can move into a
-            fairness-first conversation flow with equal timed turns and
-            structured follow-up.
+            WelcomTalk Portal is early, and thoughtful feedback from real users,
+            mediators, creators, and teams can help shape where it goes next.
           </p>
-          <p>
-            The iPhone experience remains the most private path for live
-            sessions: devices communicate directly with Multipeer Connectivity
-            and no relay is involved. The portal is the clearest place to
-            prepare the JSON request record before that conversation starts.
+          <p style="margin-top: 14px">
+            <a href="mailto:wahbehw@me.com">wahbehw@me.com</a>
           </p>
         </div>
       </main>
@@ -430,8 +717,9 @@ JSON preview appears here after generation.</pre
         <p>
           <a href="privacy.html">Privacy Policy</a>
           <a href="terms.html">Terms of Use</a>
+          <a href="mailto:wahbehw@me.com">Contact</a>
         </p>
-        <p style="margin-top: 12px">© 2026 Wael Wahbeh. All rights reserved.</p>
+        <p style="margin-top: 12px">© 2026 Wael Wahbeh. WelcomTalk Portal.</p>
       </footer>
     </div>
 
@@ -520,7 +808,7 @@ JSON preview appears here after generation.</pre
           return {
             requestId,
             createdAt: new Date().toISOString(),
-            source: "portal",
+            source: "welcomtalk-portal",
             fullName: trimmedName,
             topic: trimmedTopic,
             summary: trimmedSummary,
@@ -544,7 +832,8 @@ JSON preview appears here after generation.</pre
 
           latestJSON = JSON.stringify(record, null, 2);
           output.textContent = latestJSON;
-          statusLine.textContent = "JSON generated locally in the portal.";
+          statusLine.textContent =
+            "JSON generated locally in WelcomTalk Portal.";
         });
 
         copyButton.addEventListener("click", async () => {
@@ -573,10 +862,10 @@ JSON preview appears here after generation.</pre
           const url = URL.createObjectURL(blob);
           const anchor = document.createElement("a");
           anchor.href = url;
-          anchor.download = "portal-request.json";
+          anchor.download = "welcomtalk-portal-request.json";
           anchor.click();
           URL.revokeObjectURL(url);
-          statusLine.textContent = "JSON downloaded from the portal.";
+          statusLine.textContent = "JSON downloaded from WelcomTalk Portal.";
         });
       })();
     </script>
