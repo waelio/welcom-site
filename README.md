@@ -46,7 +46,9 @@ Build the WebAssembly bundle and sync generated assets into the repository root:
 
 That script copies the generated `app.js`, `index.js`, `intrinsics.js`, `.wasm`, and any runtime resource folders into the repository root so GitHub Pages or another static host can serve them directly.
 
-For Netlify, this repository is configured as a static deploy: publish the repository root and skip any server-side Swift build. The committed root files are the deploy artifact.
+For Netlify, this repository is configured as a static deploy with a deploy-only base directory at `netlify-static/`. Netlify installs dependencies and runs the build command from that folder, which keeps the root `Package.swift` from triggering an unwanted Swift install during deploy setup.
+
+The deploy command runs `scripts/prepare-netlify-static.sh`, which copies the committed root HTML, JavaScript, icons, and any optional runtime assets into `netlify-static/dist/` for publishing. That generated folder is ignored in git.
 
 ## Shared package note
 

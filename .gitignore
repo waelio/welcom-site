@@ -4,3 +4,4 @@
 Bundle/
 node_modules/
 .swift-version
+netlify-static/dist/

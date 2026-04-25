@@ -1,3 +1,5 @@
 [build]
-  command = "printf 'Static deploy: using committed site files from repository root.\n'"
-  publish = "."
+  base = "netlify-static"
+  command = "sh ../scripts/prepare-netlify-static.sh"
+  publish = "dist"
+  ignore = "false"
